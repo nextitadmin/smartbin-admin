@@ -2,7 +2,7 @@ import axios from "axios";
 import useTokenStore from "../stores/tokenStore";
 
 const api = axios.create({
-  baseURL: "https://smartbin-backend-staging.up.railway.app/api/",
+  baseURL: "https://smartbin-be.next-itservices.com/api/",
 });
 
 api.interceptors.request.use(
