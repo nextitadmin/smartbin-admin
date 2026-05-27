@@ -1,7 +1,7 @@
 # Test base API endpoint
 # This endpoint returns HTML content
 
-GET https://smartbin-admin-backend-production.up.railway.app/api
+GET https://smartbin-be.next-itservices.com/api
 HTTP 200
 [Asserts]
 header "Content-Type" contains "text/html"

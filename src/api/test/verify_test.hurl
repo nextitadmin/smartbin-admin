@@ -1,6 +1,6 @@
 # Test account login verification endpoint
 
-POST https://smartbin-admin-backend-production.up.railway.app/api/v1/accounts/login/verify
+POST https://smartbin-be.next-itservices.com/api/v1/accounts/login/verify
 Content-Type: application/json
 
 {

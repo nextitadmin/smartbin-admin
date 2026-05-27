@@ -1,6 +1,6 @@
 # Test create account endpoint
 
-POST https://smartbin-admin-backend-production.up.railway.app/api/v1/accounts
+POST https://smartbin-be.next-itservices.com/api/v1/accounts
 Content-Type: application/json
 
 {

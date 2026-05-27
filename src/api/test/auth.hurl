@@ -1,7 +1,7 @@
 # Test authentication endpoints
 
 # Test login endpoint
-POST https://smartbin-admin-backend-production.up.railway.app/api/v1/accounts/login
+POST https://smartbin-be.next-itservices.com/api/v1/accounts/login
 Content-Type: application/json
 
 {
