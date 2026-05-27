@@ -1,0 +1,283 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "tailwindcss";
+
+
+body {
+  font-family: 'Inter', sans-serif;
+  font-optical-sizing: auto;
+ 
+}
+
+
+.sans {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-optical-sizing: auto;
+}
+
+/* Line connecting icons externally */
+.icon-line-column::before {
+  content: "";
+  position: absolute;
+  /* Center the 2px line within the column (assuming w-12 = 3rem) */
+  left: calc(50% - 1px);
+  /* 50% of parent width minus half the line width */
+  width: 1px;
+  /* Start below the icon (icon is h-10=2.5rem, parent has pt-5=1.25rem. Top of icon is 1.25rem, bottom is 3.75rem) */
+  top: 3.8rem;
+  /* Start just below the icon circle */
+  /* Extend downwards to connect. Adjust negative value based on spacing */
+  bottom: -1rem;
+  /* Extend below the item's padding bottom */
+  background-color: #d1d5db;
+  /* Default line color (Tailwind zinc-300) */
+  z-index: 0;
+  /* Behind icon */
+}
+
+/* Hide line for the very last item's column */
+.timeline-item:last-child .icon-line-column::before {
+  display: none;
+}
+
+/* Completed line color - applied if parent timeline-item has .completed */
+.timeline-item.completed .icon-line-column::before {
+  background-color: #c4c4c4;
+  /* Tailwind gray color */
+}
+
+/* Ensure icon wrapper itself is above the line */
+.timeline-icon-wrapper {
+  position: relative;
+  z-index: 1;
+}
+ /* Add a subtle transition for the custom radio button appearance */
+ .custom-radio-inner {
+  transition: transform 0.2s ease-in-out;
+  transform: scale(0);
+  /* Start hidden */
+}
+
+input[type="radio"]:checked+label .custom-radio-inner {
+  transform: scale(1);
+  /* Scale in when checked */
+}
+
+/* Improve focus visibility for accessibility on the labels */
+input[type="radio"]:focus-visible+label {
+  outline: 2px solid #2563eb;
+  /* Example focus ring, adjust color as needed */
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+  /* Match label's rounded corners */
+}
+button{
+  cursor: pointer;
+}
+
+.stage-enter-active,
+.stage-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.stage-enter-from,
+.stage-leave-to {
+    opacity: 0;
+}
+
+.file-input-area {
+    position: relative;
+}
+
+.file-input-area input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+   /* Optional: Style for the table container for scrolling */
+   .table-container {
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
+}
+
+/* Ensure clickable table headers have pointer cursor */
+th[role="button"] {
+    cursor: pointer;
+}
+
+/* Hide sort icon initially, show on hover/focus or when active */
+th .sort-icon {
+    opacity: 0.0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+th:hover .sort-icon,
+th:focus .sort-icon,
+th .sort-icon.active {
+    opacity: 1;
+}
+
+/* ModalExamples.css */
+
+/* Basic transition for modal fade-in/out */
+.modal-enter-active,
+.modal-leave-active {
+    transition: opacity 0.2s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+    opacity: 0;
+}
+
+/* Basic styling for date/time input indicators using classes */
+.form-input-date::-webkit-calendar-picker-indicator,
+.form-input-time::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 0.5rem;
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+/* Custom radio indicator styling */
+.custom-radio {
+    appearance: none;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 50%;
+    width: 1.25rem;
+    height: 1.25rem;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.custom-radio:checked {
+    border-color: #008236;
+    background: #008236;
+}
+
+.custom-radio:checked::after {
+    content: '';
+    display: block;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    background-color: #008236;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Style container based on radio selection */
+.radio-container {
+    border: 1px solid #e5e7eb;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.radio-container:hover {
+    border-color: #a1a1aa;
+}
+
+.radio-container-checked {
+    background-color: #f0fdf4;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+/* Form input styles */
+.form-input {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    border-radius: 0.75rem;
+    outline: none;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.form-input:focus {
+    border-color: #008236;
+    box-shadow: 0 0 0 2px rgba(0, 130, 54, 0.2);
+}
+
+.form-input:disabled {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+}
+
+/* Modal overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 50;
+}
+
+/* Modal content */
+.modal-content {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    width: 100%;
+    max-width: 32rem;
+    overflow: hidden;
+}
+
+/* Button styles */
+.btn {
+    padding: 1rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    transition: all 0.15s ease;
+}
+
+.btn-primary {
+    background-color: #008236;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #00662a;
+}
+
+.btn-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 130, 54, 0.5);
+}
+
+/* Text styles */
+.text-green-700 {
+    color: #008236;
+}
+
+.text-green-700:hover {
+    color: #00662a;
+}
+
+.bg-card {
+    background-image: url(/images/cardbg.png);
+}
+input,select,textarea {
+    outline: none;
+   
+}
