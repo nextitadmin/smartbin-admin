@@ -16,7 +16,7 @@ const ActorModals = ({
   setIsNinVerifyOpen,
   isDocViewerOpen,
   setIsDocViewerOpen,
-  
+
   // Data states
   selectedUser,
   setSelectedUser,
@@ -28,13 +28,14 @@ const ActorModals = ({
   setRejectionReason,
   isViewingDetails,
   setIsViewingDetails,
-  
+
   // Functions
   handleApproveUser,
   handleRejectUser,
   HandleRejectModal,
   handleOpenNinVerify,
   handleCloseNinVerify,
+  handleVerifyNin,
   handleOpenDocViewer,
   handleCloseDocViewer,
   getNinDocUrl,
@@ -56,7 +57,7 @@ const ActorModals = ({
   };
 
   // Resident Verification Modal
-  const ResidentVerificationModal = () => {
+  const renderResidentVerificationModal = () => {
     if (!verificationModal || !selectedUser || !(selectedUser.userType === 'Resident' || selectedUser.userType === 'resident')) {
       return null;
     }
@@ -78,19 +79,19 @@ const ActorModals = ({
             <div className="">
               <div className="grid grid-cols-1 gap-4">
                 {[
-                  { label: "Name", value: selectedUser.applicant },
-                  { label: "Email", value: selectedUser.email },
-                  { label: "Phone number", value: selectedUser.phone || selectedUser.phoneNumber || "N/A" },
-                  { label: "Nationality", value: selectedUser.nationality || "N/A" },
-                  { label: "Gender", value: selectedUser.gender || "N/A" },
-                  { label: "LAWMA Customer type", value: selectedUser.LAWMACustomerType || "N/A" },
-                  { label: "NIN", value: selectedUser.nin, action: 'verifyNin' },
-                  { label: "NIN Document", value: selectedUser.ninDoc, action: 'viewDoc' },
+                  { label: "Name", value: selectedUser.applicant || (selectedUser.userId ? `${selectedUser.userId.firstName} ${selectedUser.userId.lastName}` : "N/A") },
+                  { label: "Email", value: selectedUser.email || selectedUser.userId?.email || "N/A" },
+                  { label: "Phone number", value: selectedUser.phoneNumber || selectedUser.userId?.phoneNumber || selectedUser.phone || "N/A" },
+                  { label: "Nationality", value: selectedUser.nationality || selectedUser.userId?.nationality || "N/A" },
+                  { label: "Gender", value: selectedUser.gender || selectedUser.userId?.gender || "N/A" },
+                  { label: "LAWMA Customer type", value: selectedUser.lawmaCustomerType || "N/A" },
+                  { label: "NIN", value: selectedUser.NinNo || selectedUser.nin || "N/A", action: 'verifyNin' },
+                  { label: "NIN Document", value: (selectedUser.idDocument || selectedUser.ninDoc) ? "Document uploaded" : "N/A", action: 'viewDoc' },
                   { label: "Building type", value: selectedUser.buildingType || "N/A" },
-                  { label: "House number", value: selectedUser.houseNo || "N/A" },
-                  { label: "Flat number", value: selectedUser.flatNo || "N/A" },
-                  { label: "LGA", value: selectedUser.lga || "N/A" },
-                  { label: "Closest landmark", value: selectedUser.ClosestLandmark || "N/A" },
+                  { label: "House number", value: selectedUser.houseNumber || "N/A" },
+                  { label: "Flat number", value: selectedUser.flatNumber || "N/A" },
+                  { label: "LGA", value: selectedUser.lga ? (typeof selectedUser.lga === 'object' ? selectedUser.lga.name : selectedUser.lga) : "N/A" },
+                  { label: "Closest landmark", value: selectedUser.closestLandmark || "N/A" },
                   { label: "Address", value: selectedUser.address || "N/A" },
                   { label: "User Type", value: selectedUser.userType },
                   { label: "Application Date", value: formatGenerationDate(selectedUser.date) },
@@ -161,19 +162,19 @@ const ActorModals = ({
   };
 
   // Facility Manager Verification Modal
-  const FacilityManagerVerificationModal = () => {
+  const renderFacilityManagerVerificationModal = () => {
     if (!verificationModal || !selectedUser) {
       return null;
     }
-    
+
     // Check if userType matches any facility manager variation
     const userType = selectedUser.userType?.toLowerCase();
-    const isFacilityManager = userType === 'facility manager' || 
-                             userType === 'facility_manager' || 
-                             userType === 'facilitymanager' ||
-                             userType === 'facility' ||
-                             userType === 'facility manager';
-    
+    const isFacilityManager = userType === 'facility manager' ||
+      userType === 'facility_manager' ||
+      userType === 'facilitymanager' ||
+      userType === 'facility' ||
+      userType === 'facility manager';
+
     if (!isFacilityManager) {
       return null;
     }
@@ -195,18 +196,18 @@ const ActorModals = ({
             <div className="">
               <div className="grid grid-cols-1 gap-4">
                 {[
-                  { label: "Name", value: selectedUser.applicant },
-                  { label: "Email", value: selectedUser.email },
-                  { label: "Phone number", value: selectedUser.phone || selectedUser.phoneNumber || "N/A" },
-                  { label: "Nationality", value: selectedUser.nationality || "N/A" },
-                  { label: "Gender", value: selectedUser.gender || "N/A" },
-                  { label: "LAWMA Customer type", value: selectedUser.LAWMACustomerType || "N/A" },
-                  { label: "NIN", value: selectedUser.nin, action: 'verifyNin' },
-                  { label: "NIN Document", value: selectedUser.ninDoc, action: 'viewDoc' },
+                  { label: "Name", value: selectedUser.applicant || (selectedUser.userId ? `${selectedUser.userId.firstName} ${selectedUser.userId.lastName}` : "N/A") },
+                  { label: "Email", value: selectedUser.email || selectedUser.userId?.email || "N/A" },
+                  { label: "Phone number", value: selectedUser.phoneNumber || selectedUser.userId?.phoneNumber || selectedUser.phone || "N/A" },
+                  { label: "Nationality", value: selectedUser.nationality || selectedUser.userId?.nationality || "N/A" },
+                  { label: "Gender", value: selectedUser.gender || selectedUser.userId?.gender || "N/A" },
+                  { label: "LAWMA Customer type", value: selectedUser.lawmaCustomerType || selectedUser.LAWMACustomerType || "N/A" },
+                  { label: "NIN", value: selectedUser.NinNo || selectedUser.nin || "N/A", action: 'verifyNin' },
+                  { label: "NIN Document", value: (selectedUser.idDocument || selectedUser.ninDoc) ? "Document uploaded" : "N/A", action: 'viewDoc' },
                   { label: "Building type", value: selectedUser.buildingType || "N/A" },
                   { label: "House number", value: selectedUser.houseNo || "N/A" },
                   { label: "Flat number", value: selectedUser.flatNo || "N/A" },
-                  { label: "LGA", value: selectedUser.lga || "N/A" },
+                  { label: "LGA", value: selectedUser.lga ? (typeof selectedUser.lga === 'object' ? selectedUser.lga.name : selectedUser.lga) : "N/A" },
                   { label: "Closest landmark", value: selectedUser.ClosestLandmark || "N/A" },
                   { label: "Address", value: selectedUser.address || "N/A" },
                   { label: "User Type", value: selectedUser.userType },
@@ -278,7 +279,7 @@ const ActorModals = ({
   };
 
   // Agent Verification Modal
-  const AgentVerificationModal = () => {
+  const renderAgentVerificationModal = () => {
     if (!verificationModal || !selectedUser || !(selectedUser.userType === 'Agent' || selectedUser.userType === 'agent')) {
       return null;
     }
@@ -300,12 +301,12 @@ const ActorModals = ({
             <div className="">
               <div className="grid grid-cols-1 gap-4">
                 {[
-                  { label: "Name", value: selectedUser.applicant },
-                  { label: "Email", value: selectedUser.email },
-                  { label: "Phone Number", value: selectedUser.phone || selectedUser.phoneNumber || "N/A" },
-                  { label: "LAWMA Customer type", value: selectedUser.LAWMACustomerType || "N/A" },
-                  { label: "NIN", value: selectedUser.nin, action: 'verifyNin' },
-                  { label: "NIN Document", value: selectedUser.ninDoc, action: 'viewDoc' },
+                  { label: "Name", value: selectedUser.applicant || (selectedUser.userId ? `${selectedUser.userId.firstName} ${selectedUser.userId.lastName}` : "N/A") },
+                  { label: "Email", value: selectedUser.email || selectedUser.userId?.email || "N/A" },
+                  { label: "Phone Number", value: selectedUser.phoneNumber || selectedUser.userId?.phoneNumber || selectedUser.phone || "N/A" },
+                  { label: "LAWMA Customer type", value: selectedUser.lawmaCustomerType || selectedUser.LAWMACustomerType || "N/A" },
+                  { label: "NIN", value: selectedUser.NinNo || selectedUser.nin || "N/A", action: 'verifyNin' },
+                  { label: "NIN Document", value: (selectedUser.idDocument || selectedUser.ninDoc) ? "Document uploaded" : "N/A", action: 'viewDoc' },
                   { label: "Agency Name", value: selectedUser.agencyName || "N/A" },
                   { label: "Registration Number", value: selectedUser.RegNo || selectedUser.businessRegistrationNumber || "N/A" },
                   { label: "Business Email address", value: selectedUser.businessEmail || "N/A" },
@@ -400,7 +401,7 @@ const ActorModals = ({
   };
 
   // Corporate Verification Modal
-  const CorporateVerificationModal = () => {
+  const renderCorporateVerificationModal = () => {
     if (!verificationModal || !selectedUser || !(selectedUser.userType === 'Corporate' || selectedUser.userType === 'corporate')) {
       return null;
     }
@@ -428,8 +429,8 @@ const ActorModals = ({
                   { label: "Business Phone number", value: selectedUser.businessPhone || "N/A" },
                   { label: "Business Sector", value: selectedUser.businessSector || "N/A" },
                   { label: "Company Address", value: selectedUser.businessAddress || "N/A" },
-                  { label: "NIN", value: selectedUser.nin, action: 'verifyNin' },
-                  { label: "NIN Document", value: selectedUser.ninDoc, action: 'viewDoc' },
+                  { label: "NIN", value: selectedUser.NinNo || selectedUser.nin || "N/A", action: 'verifyNin' },
+                  { label: "NIN Document", value: (selectedUser.idDocument || selectedUser.ninDoc) ? "Document uploaded" : "N/A", action: 'viewDoc' },
                   { label: "Signatory", value: `${getMembersList(selectedUser).length} members`, action: 'viewMembers' },
                   { label: "User Type", value: selectedUser.userType },
                   { label: "Application Date", value: formatGenerationDate(selectedUser.date) },
@@ -518,7 +519,7 @@ const ActorModals = ({
   };
 
   // Corporate Members Modal
-  const CorporateMembersModal = () => {
+  const renderCorporateMembersModal = () => {
     if (!membersModal || !selectedUser) {
       return null;
     }
@@ -576,7 +577,7 @@ const ActorModals = ({
   };
 
   // User Detail Modal
-  const UserDetailModal = () => {
+  const renderUserDetailModal = () => {
     if (!userDetail || !selectedMember) {
       return null;
     }
@@ -649,7 +650,7 @@ const ActorModals = ({
   };
 
   // Rejection Modal
-  const RejectionModal = () => {
+  const renderRejectionModal = () => {
     if (!rejectionModal || !selectedUser) {
       return null;
     }
@@ -668,16 +669,16 @@ const ActorModals = ({
           </div>
           <div className='my-15 space-y-3'>
             <p>Give reason</p>
-            <textarea 
-              value={rejectionReason} 
-              onChange={(e) => setRejectionReason(e.target.value)} 
+            <textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
               onInput={(e) => {
                 e.target.style.height = "auto"; // reset first
                 e.target.style.height = `${e.target.scrollHeight}px`; // grow with content
-              }} 
-              type="text" 
-              placeholder='Reason for rejecting KYC' 
-              className='w-full min-h-auto  p-5 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-700 resize-none overflow-hidden' 
+              }}
+              type="text"
+              placeholder='Reason for rejecting KYC'
+              className='w-full min-h-auto  p-5 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-700 resize-none overflow-hidden'
             />
           </div>
 
@@ -694,17 +695,73 @@ const ActorModals = ({
       </div>
     );
   };
+  // NIN Verification Modal
+  const renderNinVerifyModal = () => {
+    if (!isNinVerifyOpen || !selectedUser) {
+      return null;
+    }
+
+    const applicantName = selectedMember ? selectedMember.name : (selectedUser.applicant || selectedUser.name || 'Applicant');
+    const ninNumber = selectedMember ? selectedMember.nin : (selectedUser.NinNo || selectedUser.nin || selectedUser.idNumber || 'N/A');
+
+    return (
+      <div className='fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50 transition-opacity duration-300 ease-in-out'>
+        <div className='bg-white rounded-2xl shadow-xl px-8 py-10 w-full max-w-lg max-h-[90vh] overflow-y-auto'>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-semibold text-zinc-800">Verify NIN</h3>
+            <button
+              onClick={handleCloseNinVerify}
+              className="text-zinc-400 hover:text-zinc-600 focus:outline-none"
+            >
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+          </div>
+
+          <div className="mb-8 space-y-4">
+            <p className="text-zinc-600 text-sm">
+              Are you sure you want to verify the NIN for <span className="font-semibold text-zinc-800">{applicantName}</span>?
+            </p>
+            <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200">
+              <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-1">NIN Number</p>
+              <p className="text-lg font-mono font-semibold text-zinc-800 tracking-widest">{ninNumber}</p>
+            </div>
+            <p className="text-xs text-zinc-400">
+              This action will mark the applicant's identity verification status as verified in the system.
+            </p>
+          </div>
+
+          <div className='flex justify-end gap-3'>
+            <button
+              onClick={handleCloseNinVerify}
+              type="button"
+              className="px-5 py-2.5 border border-zinc-300 text-zinc-700 rounded-lg hover:bg-zinc-50 transition-colors text-sm font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleVerifyNin}
+              type="button"
+              className="px-5 py-2.5 bg-green-700 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium shadow-sm"
+            >
+              Confirm Verification
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
-      <ResidentVerificationModal />
-      <FacilityManagerVerificationModal />
-      <AgentVerificationModal />
-      <CorporateVerificationModal />
-      <CorporateMembersModal />
-      <UserDetailModal />
-      <RejectionModal />
-      
+      {renderResidentVerificationModal()}
+      {renderFacilityManagerVerificationModal()}
+      {renderAgentVerificationModal()}
+      {renderCorporateVerificationModal()}
+      {renderCorporateMembersModal()}
+      {renderUserDetailModal()}
+      {renderRejectionModal()}
+      {renderNinVerifyModal()}
+
       {/* Document Viewer Modal */}
       <DocumentViewer
         isOpen={isDocViewerOpen}

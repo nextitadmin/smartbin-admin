@@ -67,7 +67,7 @@ const KYC = () => {
   const [newReportEndDate, setNewReportEndDate] = useState('');
 
 
-  const fetchKYCAPI = async (tab = activeTab) => {
+  const fetchKYCAPI = async (tab = activeTab, page = 1) => {
     // Check if we're in development mode (supports CRA and Vite)
     // const isDev =
     //   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production') ||
@@ -98,7 +98,7 @@ const KYC = () => {
     // Production API call
     try {
       setIsLoading(true);
-      const { data } = await api.get(`/lawma/kycs?status=${tab}`);
+      const { data } = await api.get(`/lawma/kycs?status=${tab}&page=${page}&limit=${limit}`);
       console.log("KYC data", data);
       
       if (data && data.data && Array.isArray(data.data)) {
@@ -113,20 +113,39 @@ const KYC = () => {
           ...item
         }));
         setReports(reportList);
+        
+        if (data.paging) {
+          setCurrentPage(Number(data.paging.page) || 1);
+          setTotalPages(Number(data.paging.pages) || 1);
+        } else {
+          setCurrentPage(1);
+          setTotalPages(1);
+        }
       } else {
         console.error('API returned unexpected response structure:', data);
         setReports([]);
+        setCurrentPage(1);
+        setTotalPages(1);
       }
     } catch (error) {
       console.error('Error fetching KYC data:', error);
       setReports([]);
+      setCurrentPage(1);
+      setTotalPages(1);
       showNotification('Failed to fetch KYC data', 'error');
     } finally {
       setIsLoading(false);
     }
   }
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      fetchKYCAPI(activeTab, newPage);
+    }
+  };
+
   useEffect(() => {
-    fetchKYCAPI(activeTab);
+    fetchKYCAPI(activeTab, 1);
   }, [activeTab]);
 
   const showNotification = (message, type) => {
@@ -242,6 +261,9 @@ const KYC = () => {
   const [currentDocument, setCurrentDocument] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [isViewingDetails, setIsViewingDetails] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   function normalizeUserType(rawType) {
     const value = sanitizeUserType(rawType).toLowerCase();
@@ -345,12 +367,8 @@ const KYC = () => {
 
       // Production API call - using the correct endpoint
       console.log('Approving user with ID:', user.id);
-      console.log('API endpoint:', `/lawma/kycs/${user.id}`);
-      const { data } = await api.patch(`/lawma/kycs/${user.id}`, {
-        data: user,
-        status: 'approved',
-        message: 'Kyc application approved'
-      });
+      console.log('API endpoint:', `/lawma/kycs/${user.id}/approve`);
+      const { data } = await api.patch(`/lawma/kycs/${user.id}/approve`);
       console.log('Approval response:', data);
       if (data) {
         showNotification(`User ${user.applicant} has been approved`, 'success');
@@ -386,11 +404,8 @@ const KYC = () => {
       // Production API call - using the correct reject endpoint
       console.log('Rejecting user with ID:', user.id);
       console.log('API endpoint:', `/lawma/kycs/${user.id}/reject`);
-      console.log('Rejection reason:', rejectionReason || 'No reason provided');
       const { data } = await api.patch(`/lawma/kycs/${user.id}/reject`, {
-        data: user,
-        status: 'rejected',
-        message: rejectionReason || 'No reason provided'
+        reason: rejectionReason || 'No reason provided'
       });
       console.log('Rejection response:', data);
       if (data) {
@@ -424,6 +439,47 @@ const KYC = () => {
   };
   const handleCloseNinVerify = () => {
     setIsNinVerifyOpen(false);
+  };
+  const handleVerifyNin = async () => {
+    try {
+      const kycId = selectedUser?.id || selectedUser?._id;
+      if (!kycId) {
+        showNotification('No active user selected for verification', 'error');
+        return;
+      }
+      
+      console.log('Verifying NIN for KYC:', kycId);
+      const { data } = await api.patch(`/lawma/kycs/${kycId}/verify-nin`);
+      console.log('NIN verification response:', data);
+      
+      if (data) {
+        showNotification('NIN verified successfully', 'success');
+        setIsNinVerifyOpen(false);
+        fetchKYCAPI(activeTab);
+        
+        // Refresh the selected user details to show updated status
+        const detailedData = await fetchDetailedKYCData(kycId);
+        if (detailedData) {
+          const enrichedUser = { ...selectedUser, ...detailedData };
+          setSelectedUser(enrichedUser);
+          
+          if (selectedMember) {
+            // Also refresh selected member in state if it's a corporate member
+            const updatedMember = enrichedUser.members?.find(
+              m => m.id === selectedMember.id || m._id === selectedMember._id
+            );
+            if (updatedMember) {
+              setSelectedMember(updatedMember);
+            }
+          }
+        }
+      } else {
+        showNotification('NIN verification failed', 'error');
+      }
+    } catch (e) {
+      console.error('Error verifying NIN:', e);
+      showNotification(`NIN verification failed: ${e.response?.data?.message || e.message}`, 'error');
+    }
   };
   const handleOpenDocViewer = (documentUrl, documentName) => {
     if (!documentUrl) {
@@ -760,6 +816,75 @@ const KYC = () => {
                           ))}
                         </tbody>
                       </table>
+                      
+                      {/* Pagination Controls */}
+                      {totalPages > 1 && (
+                        <div className="flex items-center justify-between border-t border-zinc-200 bg-white px-4 py-4 sm:px-6 rounded-b-xl">
+                          <div className="flex flex-1 justify-between sm:hidden">
+                            <button
+                              onClick={() => handlePageChange(currentPage - 1)}
+                              disabled={currentPage === 1}
+                              className={`relative inline-flex items-center rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                              Previous
+                            </button>
+                            <button
+                              onClick={() => handlePageChange(currentPage + 1)}
+                              disabled={currentPage === totalPages}
+                              className={`relative ml-3 inline-flex items-center rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                              Next
+                            </button>
+                          </div>
+                          <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                            <div>
+                              <p className="text-sm text-zinc-700">
+                                Showing page <span className="font-semibold text-green-700">{currentPage}</span> of{' '}
+                                <span className="font-semibold text-zinc-800">{totalPages}</span>
+                              </p>
+                            </div>
+                            <div>
+                              <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                <button
+                                  onClick={() => handlePageChange(currentPage - 1)}
+                                  disabled={currentPage === 1}
+                                  className={`relative inline-flex items-center rounded-l-md px-3 py-2 text-zinc-400 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-50 focus:z-20 focus:outline-offset-0 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                  <span className="sr-only">Previous</span>
+                                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                                
+                                {Array.from({ length: totalPages }, (_, index) => {
+                                  const pageNumber = index + 1;
+                                  return (
+                                    <button
+                                      key={pageNumber}
+                                      onClick={() => handlePageChange(pageNumber)}
+                                      aria-current={currentPage === pageNumber ? 'page' : undefined}
+                                      className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 ${currentPage === pageNumber ? 'z-10 bg-green-700 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700' : 'text-zinc-900 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-50 focus:outline-offset-0'}`}
+                                    >
+                                      {pageNumber}
+                                    </button>
+                                  );
+                                })}
+
+                                <button
+                                  onClick={() => handlePageChange(currentPage + 1)}
+                                  disabled={currentPage === totalPages}
+                                  className={`relative inline-flex items-center rounded-r-md px-3 py-2 text-zinc-400 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-50 focus:z-20 focus:outline-offset-0 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                  <span className="sr-only">Next</span>
+                                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              </nav>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -796,6 +921,7 @@ const KYC = () => {
                   HandleRejectModal={HandleRejectModal}
                   handleOpenNinVerify={handleOpenNinVerify}
                   handleCloseNinVerify={handleCloseNinVerify}
+                  handleVerifyNin={handleVerifyNin}
                   handleOpenDocViewer={handleOpenDocViewer}
                   handleCloseDocViewer={handleCloseDocViewer}
                   getNinDocUrl={getNinDocUrl}
