@@ -22,7 +22,7 @@ const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: DashboardIcon },
   { name: 'Revenue analysis', href: '/revenue-analysis', icon: DocumentIcon },
 
-  { name: 'Bin distribution', href: '/smartbin-overview', icon: WasteIcon },
+  { name: 'Smartbin Overview', href: '/smartbin-overview', icon: WasteIcon },
   // Assuming PSPs stands for Private Sector Participants or similar, using the people icon
   { name: 'PSPs', href: '/psp-companies', icon: TeamsIcon },
   { name: 'Reports', href: '/reports', icon: ReportIcon },
