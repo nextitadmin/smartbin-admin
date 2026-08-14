@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 // Zustand import removed
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import api from "../api/apiConfig";
+import UserManagementModal from "./UserManagementModal";
 
 
 // --- DATA AT THE TOP ---
@@ -149,7 +150,7 @@ const KPICard = ({ title, value, change, children }) => (
 
 // --- DASHBOARD SECTION COMPONENTS ---
 
-const Header = ({ activeFilter, onFilterChange }) => {
+const Header = ({ activeFilter, onFilterChange, onOpenUserManagement }) => {
   const filters = [
     { label: "All Time", value: "" },
     { label: "Today", value: "today" },
@@ -160,24 +161,33 @@ const Header = ({ activeFilter, onFilterChange }) => {
   ];
 
   return (
-    <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
       <div>
         <h1 className="text-3xl font-bold text-zinc-900">Dashboard</h1>
         <p className="text-zinc-600 mt-1">Here's a review of your activities</p>
       </div>
-      <div className="flex items-center space-x-1 bg-zinc-100 p-1 rounded-lg mt-4 sm:mt-0">
-        {filters.map((filter) => (
-          <button
-            key={filter.value}
-            onClick={() => onFilterChange && onFilterChange(filter.value)}
-            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${activeFilter === filter.value
-              ? "bg-green-500 text-white"
-              : "text-zinc-600 hover:bg-zinc-200"
-              }`}
-          >
-            {filter.label}
-          </button>
-        ))}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <button
+          type="button"
+          onClick={onOpenUserManagement}
+          className="inline-flex items-center justify-center rounded-2xl bg-green-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-green-800"
+        >
+          Manage users
+        </button>
+        <div className="flex items-center space-x-1 bg-zinc-100 p-1 rounded-lg">
+          {filters.map((filter) => (
+            <button
+              key={filter.value}
+              onClick={() => onFilterChange && onFilterChange(filter.value)}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${activeFilter === filter.value
+                ? "bg-green-500 text-white"
+                : "text-zinc-600 hover:bg-zinc-200"
+                }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
       </div>
     </header>
   );
@@ -648,6 +658,7 @@ export default function App({ backendDashboard, currentFilter, onFilterChange })
     backendDashboard ? transformBackendDashboardToDashpageData(backendDashboard) : null
   );
   const [loading, setLoading] = useState(() => !backendDashboard);
+  const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
 
   // Specific selection states for filters
   const [selectedLga, setSelectedLga] = useState("All LGAs");
@@ -725,7 +736,16 @@ export default function App({ backendDashboard, currentFilter, onFilterChange })
   return (
     <div className="bg-zinc-100 min-h-screen p-4 sm:p-8 font-sans text-zinc-800">
       <div className="max-w-screen-2xl mx-auto">
-        <Header activeFilter={currentFilter} onFilterChange={onFilterChange} />
+        <Header
+          activeFilter={currentFilter}
+          onFilterChange={onFilterChange}
+          onOpenUserManagement={() => setIsUserManagementOpen(true)}
+        />
+
+        <UserManagementModal
+          isOpen={isUserManagementOpen}
+          onClose={() => setIsUserManagementOpen(false)}
+        />
 
         {/* Row 1 */}
         <div className="flex flex-wrap -mx-3 mb-6">
