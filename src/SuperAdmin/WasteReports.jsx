@@ -94,21 +94,6 @@ const WasteReports = () => {
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Check if we should use dummy data (when no real API data is available)
-            const useDummyData = !localStorage.getItem('wastereport');
-            
-            if (useDummyData) {
-                // Use dummy data for simulation
-                setReports(dummyReportData.reports);
-                setChartDetails(dummyReportData.chartDetails);
-                setSummary(dummyReportData.summary);
-                setIsLoading(false);
-                return;
-            }
-            
             // Original API call logic
             const wasteData = JSON.parse(localStorage.getItem('wastereport'));
             if (!wasteData) {
@@ -117,7 +102,8 @@ const WasteReports = () => {
                 setIsLoading(false);
                 return;
             }
-            const { data } = await api.get(`/corporate/reports/${wasteData}`);
+            const reportId = typeof wasteData === 'object' ? (wasteData.id ?? wasteData.s_n) : wasteData;
+            const { data } = await api.get(`/lawma/superadmin/reports/${reportId}`);
             if (data.success) {
                 const pickupArray = data.data.data.pickups;
                 const reportsData = pickupArray.map((item, index) => ({
@@ -158,11 +144,16 @@ const WasteReports = () => {
             setIsLoading(false);
         } catch (error) {
             console.log("Error is ", error);
-            // Fallback to dummy data on error
-            setReports(dummyReportData.reports);
-            setChartDetails(dummyReportData.chartDetails);
-            setSummary(dummyReportData.summary);
-            setNotification({ show: true, type: 'error', message: 'Failed to load data. Showing sample data.' });
+            setReports([]);
+            setChartDetails([]);
+            setSummary({
+                period: "",
+                generationDate: "",
+                title: "",
+                totalDisposed: 0,
+                totalWeight: "0"
+            });
+            setNotification({ show: true, type: 'error', message: 'Failed to load report data.' });
             setIsLoading(false);
         }
     }

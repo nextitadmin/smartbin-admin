@@ -7,36 +7,36 @@ import Topbar from "../components/SuperAdmin/Topbar";
 
 // Helper function to convert number to words (Nigerian Naira)
 const numberToWordsNaira = (num) => {
-    if (num === null || num === undefined) return '';
-    if (num === 0) return 'Zero Naira Only';
+  if (num === null || num === undefined) return '';
+  if (num === 0) return 'Zero Naira Only';
 
-    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-    const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-    const thousands = ['', 'Thousand', 'Million', 'Billion'];
+  const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+  const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  const thousands = ['', 'Thousand', 'Million', 'Billion'];
 
-    let word = '';
+  let word = '';
 
-    const toWords = (n) => {
-        if (n === 0) return '';
-        if (n < 10) return ones[n] + ' ';
-        if (n < 20) return teens[n - 10] + ' ';
-        if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '') + ' ';
-        if (n < 1000) return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + toWords(n % 100, '') : '') + ' ';
-        return '';
-    };
+  const toWords = (n) => {
+    if (n === 0) return '';
+    if (n < 10) return ones[n] + ' ';
+    if (n < 20) return teens[n - 10] + ' ';
+    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '') + ' ';
+    if (n < 1000) return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + toWords(n % 100, '') : '') + ' ';
+    return '';
+  };
 
-    let i = 0;
-    let number = num;
-    while (number > 0) {
-        if (number % 1000 !== 0) {
-            word = toWords(number % 1000, '') + thousands[i] + (i > 0 ? ' ' : '') + word;
-        }
-        number = Math.floor(number / 1000);
-        i++;
+  let i = 0;
+  let number = num;
+  while (number > 0) {
+    if (number % 1000 !== 0) {
+      word = toWords(number % 1000, '') + thousands[i] + (i > 0 ? ' ' : '') + word;
     }
+    number = Math.floor(number / 1000);
+    i++;
+  }
 
-    return word.trim() + ' Naira Only';
+  return word.trim() + ' Naira Only';
 };
 
 // --- Raw SVG Icons (Hero Icons) ---
@@ -148,13 +148,13 @@ const MOCK_PENDING_BILLS = Array.from({ length: 15 }, (_, i) => ({
   service: "Waste Bin Disposal",
   amount: (3500 + i * 1000).toFixed(2),
   status: "Pending",
-  // Based on design, only one row has 'Pay now'
-  action: i === 4 ? "Pay now" : "View bill",
+  // Based on design, only one row has 'Make Payment'
+  action: i === 4 ? "Make Payment" : "View bill",
   // Add multiple payment items for bills
   paymentItems: [
-    { 
-      description: "Waste Bin Disposal Service", 
-      amount: 3500 + i * 1000 
+    {
+      description: "Waste Bin Disposal Service",
+      amount: 3500 + i * 1000
     },
     // { 
     //     description: 'Environmental compliance fee', 
@@ -185,9 +185,9 @@ const MOCK_PAYMENTS = Array.from({ length: 15 }, (_, i) => ({
   transactionDate: new Date().toLocaleString(),
   address: `${100 + i} Main Street, Lagos`,
   paymentItems: [
-    { 
-      description: i % 3 === 0 ? "Waste Collection Service" : "Smart Bin purchase", 
-      amount: 20000 + i * 50 
+    {
+      description: i % 3 === 0 ? "Waste Collection Service" : "Smart Bin purchase",
+      amount: 20000 + i * 50
     }
   ],
   currencySymbol: "₦",
@@ -244,7 +244,7 @@ const ReconciliationTable = ({ columns, tabType }) => {
   // Handle action clicks
   const handleActionClick = (action, row) => {
     console.log("Action clicked:", action, "Row data:", row);
-    
+
     try {
       if (action === "View receipt") {
         // Store payment ID in localStorage for the receipt component
@@ -266,13 +266,13 @@ const ReconciliationTable = ({ columns, tabType }) => {
           phoneNumber: `+234 80${Math.floor(Math.random() * 1000000000)}`, // Generate random phone
           transactionDate: new Date().toLocaleString(),
           paymentItems: row.paymentItems || [
-            { 
-              description: row.service, 
-              amount: parseFloat(row.amount) 
+            {
+              description: row.service,
+              amount: parseFloat(row.amount)
             }
           ],
           currencySymbol: "₦",
-          amountInWords: row.paymentItems ? 
+          amountInWords: row.paymentItems ?
             numberToWordsNaira(row.paymentItems.reduce((sum, item) => sum + item.amount, 0)) :
             numberToWordsNaira(parseFloat(row.amount)),
           address: "Lagos, Nigeria", // Default address
@@ -284,9 +284,9 @@ const ReconciliationTable = ({ columns, tabType }) => {
         console.log("Navigating to bills receipt with data:", billData);
         // Navigate to BillsReceipt page
         navigate("/bills-receipt");
-      } else if (action === "Pay now") {
+      } else if (action === "Make Payment") {
         // Handle pay now action if needed
-        console.log("Pay now clicked for:", row);
+        console.log("Make Payment clicked for:", row);
       }
     } catch (error) {
       console.error("Error in handleActionClick:", error);
@@ -342,9 +342,9 @@ const ReconciliationTable = ({ columns, tabType }) => {
     return "text-zinc-600 bg-zinc-100 border-zinc-300"; // Fallback
   };
 
-  // Updated styles to match design colors (Red for Pay now, Green for others)
+  // Updated styles to match design colors (Red for Make Payment, Green for others)
   const getActionStyle = (action) => {
-    if (action === "Pay now") return "text-red-500 font-medium";
+    if (action === "Make Payment") return "text-red-500 font-medium";
     return "text-green-500 font-medium";
   };
 
@@ -424,7 +424,7 @@ const ReconciliationTable = ({ columns, tabType }) => {
           <TimeFilterButton label="Today" value="Today" />
 
           {/* Month selection component */}
-          
+
           <MonthFilterButton cla label="This Month" value="This Month" />
 
           <TimeFilterButton
@@ -454,11 +454,10 @@ const ReconciliationTable = ({ columns, tabType }) => {
                     key={col.key}
                     onClick={() => col.sortable && handleSort(col.key)}
                     scope="col"
-                    className={`px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 ${
-                      col.sortable
+                    className={`px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 ${col.sortable
                         ? "cursor-pointer hover:bg-zinc-100 transition duration-150"
                         : ""
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center">
                       {col.label}
@@ -561,7 +560,7 @@ const SummaryCards = () => {
       valueColor: "text-green-700",
       isCurrency: true,
       subtitle: "₦850k ₦150k",
-      subtitles:"Bin purchase Waste disposal",
+      subtitles: "Bin purchase Waste disposal",
     },
   ];
 
@@ -637,11 +636,10 @@ const App = () => {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-2 text-sm font-medium transition duration-200 ${
-                      activeTab === tab
+                    className={`px-4 py-2 text-sm font-medium transition duration-200 ${activeTab === tab
                         ? "text-green-500 border-b-2 border-green-500" // Changed active tab color to green border for contrast
                         : "text-zinc-500 hover:text-zinc-700"
-                    }`}
+                      }`}
                   >
                     {tab}
                   </button>

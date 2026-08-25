@@ -136,19 +136,6 @@ const PaymentReportPage = () => {
             // Simulate API delay
             await new Promise(resolve => setTimeout(resolve, 2000));
 
-            // Check if we should use dummy data (when no real API data is available)
-            const useDummyData = !localStorage.getItem('paymentHistory');
-
-            if (useDummyData) {
-                // Use dummy data for simulation and format the date
-                setReportData({
-                    ...dummyReportData,
-                    generatedDate: formatGenerationDate(dummyReportData.generatedDate)
-                });
-                setIsLoading(false);
-                return;
-            }
-
             // Original API call logic
             const paymentData = JSON.parse(localStorage.getItem('paymentHistory'));
             if (!paymentData) {
@@ -158,7 +145,8 @@ const PaymentReportPage = () => {
                 return;
             }
 
-            const { data } = await api.get(`/corporate/reports/${paymentData}`);
+            const reportId = typeof paymentData === 'object' ? (paymentData.id ?? paymentData.s_n) : paymentData;
+            const { data } = await api.get(`/lawma/superadmin/reports/${reportId}`);
             if (data.success) {
                 const reportsData = data.data.data.records.map((item, index) => ({
                     sn: index + 1,
@@ -189,12 +177,8 @@ const PaymentReportPage = () => {
             setIsLoading(false);
         } catch (error) {
             console.log("Error is ", error);
-            // Fallback to dummy data on error and format the date
-            setReportData({
-                ...dummyReportData,
-                generatedDate: formatGenerationDate(dummyReportData.generatedDate)
-            });
-            setError('Failed to load data. Showing sample data.');
+            setError('Failed to load report data.');
+            setReportData({ transactions: [] });
             setIsLoading(false);
         }
     }

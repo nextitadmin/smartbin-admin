@@ -107,27 +107,16 @@ const SmartBinReport = () => {
         try {
             setIsLoading(true);
             
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Check if we should use dummy data (when no real API data is available)
-            const useDummyData = !localStorage.getItem('binreport');
-            
-            if (useDummyData) {
-                // Use dummy data for simulation
-                setReportData(dummyReportData);
-                setIsLoading(false);
-                return;
-            }
-            
             // Original API call logic
             const binData = JSON.parse(localStorage.getItem('binreport'));
             if (!binData) {
                 setReportData({ items: [] });
                 setNotification({ show: true, type: 'error', message: 'No bin report found in localStorage.' });
+                setIsLoading(false);
                 return;
             }
-            const { data } = await api.get(`/corporate/reports/${binData}`);
+            const reportId = typeof binData === 'object' ? (binData.id ?? binData.s_n) : binData;
+            const { data } = await api.get(`/lawma/superadmin/reports/${reportId}`);
             if (data.success) {
                 const reportsData = data.data.data.records.map((item, index) => ({
                     sn: index + 1,
@@ -150,9 +139,8 @@ const SmartBinReport = () => {
             setIsLoading(false);
         } catch (error) {
             console.log("Error is ", error);
-            // Fallback to dummy data on error
-            setReportData(dummyReportData);
-            setNotification({ show: true, type: 'error', message: 'Failed to load data. Showing sample data.' });
+            setReportData({ items: [] });
+            setNotification({ show: true, type: 'error', message: 'Failed to load report data.' });
             setIsLoading(false);
         }
     }
