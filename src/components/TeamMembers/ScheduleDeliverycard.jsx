@@ -1,43 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
-// --- Mock Data & API ---
-// This simulates fetching data from an API endpoint.
-const mockDeliveryData = {
-    orderId: '#D900A',
-    status: 'Scheduled for delivery',
-    date: '09/08/2023, 2:53PM',
-    customer: {
-        name: 'King Midas',
-        phone: '+234 9123456789',
-        email: 'kingmidas@example.com',
-        address: '12 Bode Thomas Avenue, Surulere, Lagos',
-        lga: 'Surulere',
-    },
-    items: [
-        { name: 'Big Smart TV', quantity: 1 },
-    ],
-    inventory: {
-        name: 'Apapa/Warehouse',
-        shipmentTo: 'Mainland/Hub/Ikeja',
-        dateInventoried: '09/08/2023, 2:53PM',
-        dateDispatched: '09/08/2023, 2:53PM',
-    },
-    assignedTo: null,
-};
-
-const mockTeamMembers = [
-    { id: 1, name: 'Adewale Adeoye', email: 'adewaleadeoye@email.com' },
-    { id: 2, name: 'Bisi Oladapo', email: 'bisioladapo@email.com' },
-    { id: 3, name: 'Chinedu Okoro', email: 'chineduokoro@email.com' },
-    { id: 4, name: 'Fatima Bello', email: 'fatimabello@email.com' },
-];
-
-const fetchDeliveryData = () => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(mockDeliveryData);
-        }, 1000); // Simulate network delay
-    });
+const fetchDeliveryData = async () => {
+    return {
+        orderId: '',
+        status: '',
+        date: '',
+        customer: { name: '', phone: '', email: '', address: '', lga: '' },
+        items: [],
+        inventory: {},
+        assignedTo: null,
+    };
 };
 
 // --- SVG Icons (Heroicons) ---
@@ -69,7 +41,7 @@ export default function App() {
     const [isLoading, setIsLoading] = useState(true);
     const [currentView, setCurrentView] = useState('details'); // 'details', 'assign'
 
-    const [selectedTeamMember, setSelectedTeamMember] = useState(mockTeamMembers[0]);
+    const [selectedTeamMember, setSelectedTeamMember] = useState({ name: '', email: '' });
     const [comment, setComment] = useState('');
 
     useEffect(() => {
@@ -78,10 +50,9 @@ export default function App() {
             fetchDeliveryData().then(data => {
                 setDeliveryData(data);
                 if (data.assignedTo) {
-                    const assignedMember = mockTeamMembers.find(m => m.name === data.assignedTo.name);
-                    setSelectedTeamMember(assignedMember || mockTeamMembers[0]);
+                    setSelectedTeamMember(data.assignedTo);
                 } else {
-                    setSelectedTeamMember(mockTeamMembers[0]);
+                    setSelectedTeamMember({ name: '', email: '' });
                 }
                 setIsLoading(false);
             });
@@ -91,19 +62,10 @@ export default function App() {
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => {
         setIsModalOpen(false);
-        // Reset view to details when closing, after a short delay for the animation
         setTimeout(() => setCurrentView('details'), 300);
     };
 
     const handleGoToAssignView = () => {
-        if (deliveryData.assignedTo) {
-            // If reassigning, set a default for the dropdown that isn't the current member
-            const defaultNewMember = mockTeamMembers.find(m => m.name !== deliveryData.assignedTo.name) || mockTeamMembers[0];
-            setSelectedTeamMember(defaultNewMember);
-        } else {
-            // For a new assignment, default to the first member
-            setSelectedTeamMember(mockTeamMembers[0]);
-        }
         setCurrentView('assign');
     };
 
@@ -130,9 +92,8 @@ export default function App() {
     };
 
     const handleSelectChange = (e) => {
-        const member = mockTeamMembers.find(m => m.name === e.target.value);
-        setSelectedTeamMember(member);
-    }
+        setSelectedTeamMember({ name: e.target.value, email: '' });
+    };
 
     // --- Render Functions for Modal Content ---
     const renderDetailsView = () => (
@@ -187,7 +148,7 @@ export default function App() {
     );
 
     const renderAssignView = () => {
-        const currentAssignee = deliveryData.assignedTo ? mockTeamMembers.find(m => m.name === deliveryData.assignedTo.name) : null;
+        const currentAssignee = deliveryData.assignedTo || null;
 
         return (
             <div className="p-6">
@@ -217,13 +178,11 @@ export default function App() {
                         <div className="relative">
                             <select
                                 id="team-member"
-                                value={selectedTeamMember.name}
+                                value={selectedTeamMember?.name || ''}
                                 onChange={handleSelectChange}
                                 className="w-full appearance-none bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                             >
-                                {mockTeamMembers.map(member => (
-                                    <option key={member.id} value={member.name}>{member.name}</option>
-                                ))}
+                                <option value="" disabled>Select team member</option>
                             </select>
                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
                                 <ChevronDownIcon />

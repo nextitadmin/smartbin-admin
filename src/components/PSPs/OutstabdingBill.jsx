@@ -4,130 +4,7 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import Papa from "papaparse";
 
-// --- Mock Data ---
-const mockData = [
-    {
-        id: 1,
-        billID: "BILL-001",
-        customerName: "Adetutu James",
-        address: "123 Victoria Island, Lagos",
-        amount: 15000,
-        dueDate: "26-05-25",
-        status: "Overdue",
-        description: "Smart bin service fee",
-        details: "view details",
-    },
-    {
-        id: 2,
-        billID: "BILL-002",
-        customerName: "John Doe",
-        address: "456 Ikoyi, Lagos",
-        amount: 25000,
-        dueDate: "28-05-25",
-        status: "Pending",
-        description: "Monthly subscription",
-        details: "view details",
-    },
-    {
-        id: 3,
-        billID: "BILL-003",
-        customerName: "Jane Smith",
-        address: "789 Lekki, Lagos",
-        amount: 18000,
-        dueDate: "30-05-25",
-        status: "Overdue",
-        description: "Service fee",
-        details: "view details",
-    },
-    {
-        id: 4,
-        billID: "BILL-004",
-        customerName: "Mike Johnson",
-        address: "321 Surulere, Lagos",
-        amount: 32000,
-        dueDate: "01-06-25",
-        status: "Pending",
-        description: "Quarterly payment",
-        details: "view details",
-    },
-    {
-        id: 5,
-        billID: "BILL-005",
-        customerName: "Sarah Wilson",
-        address: "654 Yaba, Lagos",
-        amount: 12000,
-        dueDate: "03-06-25",
-        status: "Overdue",
-        description: "Maintenance fee",
-        details: "view details",
-    },
-    {
-        id: 6,
-        billID: "BILL-006",
-        customerName: "David Brown",
-        address: "987 Ikeja, Lagos",
-        amount: 22000,
-        dueDate: "05-06-25",
-        status: "Pending",
-        description: "Installation fee",
-        details: "view details",
-    },
-    {
-        id: 7,
-        billID: "BILL-007",
-        customerName: "Lisa Davis",
-        address: "147 Gbagada, Lagos",
-        amount: 28000,
-        dueDate: "07-06-25",
-        status: "Overdue",
-        description: "Service upgrade",
-        details: "view details",
-    },
-    {
-        id: 7,
-        billID: "BILL-007",
-        customerName: "Lisa Davis",
-        address: "147 Gbagada, Lagos",
-        amount: 28000,
-        dueDate: "07-06-25",
-        status: "Overdue",
-        description: "Service upgrade",
-        details: "view details",
-    },
-    {
-        id: 7,
-        billID: "BILL-007",
-        customerName: "Lisa Davis",
-        address: "147 Gbagada, Lagos",
-        amount: 28000,
-        dueDate: "07-06-25",
-        status: "Overdue",
-        description: "Service upgrade",
-        details: "view details",
-    },
-    {
-        id: 7,
-        billID: "BILL-007",
-        customerName: "Lisa Davis",
-        address: "147 Gbagada, Lagos",
-        amount: 28000,
-        dueDate: "07-06-25",
-        status: "Overdue",
-        description: "Service upgrade",
-        details: "view details",
-    },
-    {
-        id: 7,
-        billID: "BILL-007",
-        customerName: "Lisa Davis",
-        address: "147 Gbagada, Lagos",
-        amount: 28000,
-        dueDate: "07-06-25",
-        status: "Overdue",
-        description: "Service upgrade",
-        details: "view details",
-    },
-];
+const allBills = [];
 
 // --- SVG Icons ---
 import {
@@ -416,7 +293,7 @@ export default function OutstandingBill() {
 
     // Get unique values for dropdowns
     const getUniqueValues = (key) => {
-        return [...new Set(mockData.map((item) => item[key]))];
+        return [...new Set(allBills.map((item) => item[key]))];
     };
 
     const customerNames = getUniqueValues("customerName");
@@ -443,7 +320,7 @@ export default function OutstandingBill() {
     // Pagination helper functions
     const getFilteredData = () => {
         // Apply filters first
-        let filteredData = mockData.filter((bill) => {
+        let filteredData = allBills.filter((bill) => {
             return Object.keys(filters).every((key) => {
                 if (!filters[key]) return true;
                 return bill[key] === filters[key];
@@ -485,15 +362,9 @@ export default function OutstandingBill() {
     const totalPages = getTotalPages();
     const paginatedBills = getPaginatedData();
 
-    // Mock API call to fetch data
     useEffect(() => {
-        setLoading(true);
-        const timer = setTimeout(() => {
-            setBills(paginatedBills);
-            setLoading(false);
-        }, 1500); // Simulate network delay
-
-        return () => clearTimeout(timer);
+        setBills(paginatedBills);
+        setLoading(false);
     }, [currentPage, filters, searchTerm, sortConfig]);
 
     // Reset to first page when filters or search change

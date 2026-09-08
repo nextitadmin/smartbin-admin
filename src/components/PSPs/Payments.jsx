@@ -4,130 +4,6 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import Papa from "papaparse";
 
-// --- Mock Data ---
-const mockData = [
-    {
-        id: 1,
-        paymentID: "PAY-001",
-        customerName: "Adetutu James",
-        address: "123 Victoria Island, Lagos",
-        amount: 15000,
-        paymentDate: "26-05-25",
-        status: "Completed",
-        paymentMethod: "Bank Transfer",
-        description: "Smart bin service fee",
-        details: "view details",
-    },
-    {
-        id: 2,
-        paymentID: "PAY-002",
-        customerName: "John Doe",
-        address: "456 Ikoyi, Lagos",
-        amount: 25000,
-        paymentDate: "28-05-25",
-        status: "Pending",
-        paymentMethod: "Card Payment",
-        description: "Monthly subscription",
-        details: "view details",
-    },
-    {
-        id: 3,
-        paymentID: "PAY-003",
-        customerName: "Jane Smith",
-        address: "789 Lekki, Lagos",
-        amount: 18000,
-        paymentDate: "30-05-25",
-        status: "Completed",
-        paymentMethod: "Mobile Money",
-        description: "Service fee",
-        details: "view details",
-    },
-    {
-        id: 4,
-        paymentID: "PAY-004",
-        customerName: "Mike Johnson",
-        address: "321 Surulere, Lagos",
-        amount: 32000,
-        paymentDate: "01-06-25",
-        status: "Failed",
-        paymentMethod: "Bank Transfer",
-        description: "Quarterly payment",
-        details: "view details",
-    },
-    {
-        id: 5,
-        paymentID: "PAY-005",
-        customerName: "Sarah Wilson",
-        address: "654 Yaba, Lagos",
-        amount: 12000,
-        paymentDate: "03-06-25",
-        status: "Completed",
-        paymentMethod: "Card Payment",
-        description: "Maintenance fee",
-        details: "view details",
-    },
-    {
-        id: 6,
-        paymentID: "PAY-006",
-        customerName: "David Brown",
-        address: "987 Ikeja, Lagos",
-        amount: 22000,
-        paymentDate: "05-06-25",
-        status: "Pending",
-        paymentMethod: "Mobile Money",
-        description: "Installation fee",
-        details: "view details",
-    },
-    {
-        id: 7,
-        paymentID: "PAY-007",
-        customerName: "Lisa Davis",
-        address: "147 Gbagada, Lagos",
-        amount: 28000,
-        paymentDate: "07-06-25",
-        status: "Completed",
-        paymentMethod: "Bank Transfer",
-        description: "Service upgrade",
-        details: "view details",
-    },
-    {
-        id: 8,
-        paymentID: "PAY-008",
-        customerName: "Robert Taylor",
-        address: "258 Victoria Island, Lagos",
-        amount: 19500,
-        paymentDate: "10-06-25",
-        status: "Completed",
-        paymentMethod: "Card Payment",
-        description: "Monthly subscription",
-        details: "view details",
-    },
-    {
-        id: 9,
-        paymentID: "PAY-009",
-        customerName: "Grace Okafor",
-        address: "369 Ikoyi, Lagos",
-        amount: 31000,
-        paymentDate: "12-06-25",
-        status: "Failed",
-        paymentMethod: "Mobile Money",
-        description: "Service fee",
-        details: "view details",
-    },
-    {
-        id: 10,
-        paymentID: "PAY-010",
-        customerName: "Emmanuel Adebayo",
-        address: "741 Lekki, Lagos",
-        amount: 27500,
-        paymentDate: "15-06-25",
-        status: "Completed",
-        paymentMethod: "Bank Transfer",
-        description: "Installation fee",
-        details: "view details",
-    },
-];
-
 // --- SVG Icons ---
 import {
     SearchIcon,
@@ -424,7 +300,7 @@ export default function Payments() {
 
     // Get unique values for dropdowns
     const getUniqueValues = (key) => {
-        return [...new Set(mockData.map((item) => item[key]))];
+        return [...new Set(allPayments.map((item) => item[key]))];
     };
 
     const customerNames = getUniqueValues("customerName");
@@ -450,7 +326,7 @@ export default function Payments() {
     // Pagination helper functions
     const getFilteredData = () => {
         // Apply filters first
-        let filteredData = mockData.filter((payment) => {
+        let filteredData = allPayments.filter((payment) => {
             return Object.keys(filters).every((key) => {
                 if (!filters[key]) return true;
                 return payment[key] === filters[key];
@@ -492,15 +368,9 @@ export default function Payments() {
     const totalPages = getTotalPages();
     const paginatedPayments = getPaginatedData();
 
-    // Mock API call to fetch data
     useEffect(() => {
-        setLoading(true);
-        const timer = setTimeout(() => {
-            setPayments(paginatedPayments);
-            setLoading(false);
-        }, 1500); // Simulate network delay
-
-        return () => clearTimeout(timer);
+        setPayments(paginatedPayments);
+        setLoading(false);
     }, [currentPage, filters, searchTerm, sortConfig]);
 
     // Reset to first page when filters or search change
@@ -748,6 +618,7 @@ export default function Payments() {
                                                         <button
                                                             onClick={() => {
                                                                 localStorage.setItem('paymentId', payment.paymentID);
+                                                                localStorage.setItem('paymentData', JSON.stringify(payment));
                                                                 navigate('/payment-receipt');
                                                             }}
                                                             className="text-green-600 hover:text-green-800 font-medium flex items-center gap-2"

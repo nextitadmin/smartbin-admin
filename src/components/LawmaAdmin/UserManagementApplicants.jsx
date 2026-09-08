@@ -3,7 +3,6 @@ import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import api from '../../api/apiConfig';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import demoUserDetails from '../../data/demoUserManager';
 import SkeletonLoader from '../SkeletonLoader';
 import {
   MagnifyingGlassIcon,
@@ -65,125 +64,7 @@ const Applicants = () => {
 
 
   const fetchKYCAPI = async (tab = activeTab) => {
-    // Check if we're in development mode (supports CRA and Vite)
-    const isDev =
-      (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production') ||
-      process.env.NODE_ENV === 'development';
-
-    if (isDev) {
-      // Use demoUserManager data in development with brief delay
-      setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      try {
-        const details = demoUserDetails || {};
-        const rows = [];
-
-        // Process residents
-        // if (Array.isArray(details.resident)) {
-        //   details.resident.forEach((user, index) => {
-        //     rows.push({
-        //       id: `resident-${index}`,
-        //       name: user.name || '',
-        //       userId: user.userID || '',
-        //       email: user.email || '',
-        //       lga: user.lga || '',
-        //       userType: user.customerType || 'Resident',
-        //       pspCompany: user.pspCompany || '',
-        //       status: user.status || 'Active',
-        //       phone: user.phoneNumber || '',
-        //       address: user.address || '',
-        //       subscription: user.subscription || '',
-        //       lastLogin: user.lastLogin || '',
-        //       expiration: user.expiration || '',
-        //       date: user.dateAdded || new Date().toISOString()
-        //     });
-        //   });
-        // }
-
-        // Process agents
-        if (Array.isArray(details.agent)) {
-          details.agent.forEach((user, index) => {
-            rows.push({
-              id: `agent-${index}`,
-              name: user.name || '',
-              userId: user.userID || '',
-              email: user.email || '',
-              lga: user.lga || '',
-              userType: user.customerType || 'Agent',
-              pspCompany: user.agencyName || '',
-              status: user.status || 'Active',
-              phone: user.phoneNumber || '',
-              address: user.address || '',
-              subscription: user.subscription || '',
-              expiration: user.expiration || '',
-              lastLogin: user.lastLogin || '',
-              registrationNumber: user.registrationNumber || '',
-              date: user.dateAdded || new Date().toISOString()
-            });
-          });
-        }
-
-        // Process corporate
-        // if (Array.isArray(details.corporate)) {
-        //   details.corporate.forEach((user, index) => {
-        //     rows.push({
-        //       id: `corporate-${index}`,
-        //       name: user.name || '',
-        //       userId: user.userID || '',
-        //       email: user.businessEmail || '',
-        //       lga: user.lga || '',
-        //       userType: user.customerType || 'Corporate',
-        //       pspCompany: user.pspCompany || '',
-        //       status: user.status || 'Active',
-        //       phone: user.businessPhone || '',
-        //       address: user.address || '',
-        //       subscription: user.subscription || '',
-        //       expiration: user.expiration || '',
-        //       lastLogin: user.lastLogin || '',
-        //       date: user.dateAdded || new Date().toISOString()
-        //     });
-        //   });
-        // }
-
-        // Process facility managers
-        if (Array.isArray(details.facilityManager)) {
-          details.facilityManager.forEach((user, index) => {
-            rows.push({
-              id: `facility-${index}`,
-              name: user.name || '',
-              userId: user.userID || '',
-              email: user.email || '',
-              lga: user.lga || '',
-              userType: user.customerType || 'Facility Manager',
-              pspCompany: user.pspCompany || '',
-              status: user.status || 'Active',
-              phone: user.phoneNumber || '',
-              address: user.address || '',
-              subscription: user.subscription || '',
-              expiration: user.expiration || '',
-              lastLogin: user.lastLogin || '',
-              binID: user.binID || '',
-              binStatus: user.binStatus || '',
-              buildingName: user.buildingName || '',
-              branchName: user.branchName || '',
-              branchAddress: user.branchAddress || '',
-              date: user.dateAdded || new Date().toISOString()
-            });
-          });
-        }
-
-        setReports(rows);
-      } catch (e) {
-        console.error('Error building demo user data:', e);
-        setReports([]);
-      } finally {
-        setIsLoading(false);
-      }
-      return;
-    }
-
-    // Production API call
+    setIsLoading(true);
     try {
       const { data } = await api.get(`admin/users`);
       

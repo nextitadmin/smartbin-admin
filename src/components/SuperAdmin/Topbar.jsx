@@ -6,13 +6,36 @@ import { MenuIcon } from '../icons';
 import { LogoutIcon } from '../icons2';
 import useLogout from '../../hooks/useLogout';
 import useSuperAdminStore from '../../stores/superAdminStore';
+import api from '../../api/apiConfig';
 
 export default function Topbar({ onMenuClick }) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const { logout } = useLogout();
   const resetSuperAdminStore = useSuperAdminStore((state) => state.reset);
   const profile = useSuperAdminStore((state) => state.profile);
+  const setProfile = useSuperAdminStore((state) => state.setProfile);
+  const setUser = useSuperAdminStore((state) => state.setUser);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchAdminProfile = async () => {
+      try {
+        const response = await api.get('/lawma/auth/me');
+        if (response.data?.success && response.data?.data) {
+          const userData = response.data.data;
+          if (typeof setUser === 'function') {
+            setUser(userData);
+          } else if (typeof setProfile === 'function') {
+            setProfile(userData);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch Super Admin profile:', error);
+      }
+    };
+
+    fetchAdminProfile();
+  }, [setUser, setProfile]);
 
   const openLogoutModal = () => {
     setIsLogoutModalOpen(true);
@@ -32,6 +55,13 @@ export default function Topbar({ onMenuClick }) {
     // Close modal
     closeLogoutModal();
   };
+
+  // Helper to format role (e.g., 'super_admin' -> 'Super Admin')
+  const formattedRole = profile?.role
+    ? profile.role
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+    : 'Super Admin';
 
   return (
     <>
@@ -60,11 +90,11 @@ export default function Topbar({ onMenuClick }) {
           <div className="flex items-center gap-2 lg:pr-4">
             <div className="text-sm flex flex-col items-end">
               <p className="font-light text-zinc-900 text-lg">
-                {profile?.name || "UserName"}
+                {profile?.name || "Lawma Super Admin"}
               </p>
               <p className="text-xs text-zinc-900 flex items-center gap-1">
                 <span className="w-3 h-3 bg-green-600 border border-white rounded-full"></span>
-                Super Admin
+                {formattedRole}
               </p>
             </div>
           </div>

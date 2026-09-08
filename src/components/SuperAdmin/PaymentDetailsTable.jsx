@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import pspRevenueData from "../../mock/pspRevenueData";
 
 const formatNaira = (value) => {
   const num = typeof value === "number" ? value : Number(String(value).replace(/,/g, ""));
@@ -15,7 +14,7 @@ const formatNaira = (value) => {
 const PaymentDetailsTable = ({ pspRevenue = [] }) => {
   const navigate = useNavigate();
 
-  const fullRows = Array.isArray(pspRevenue) && pspRevenue.length ? pspRevenue : pspRevenueData;
+  const fullRows = Array.isArray(pspRevenue) ? pspRevenue : [];
   const previewRows = fullRows.slice(0, 5);
 
   return (

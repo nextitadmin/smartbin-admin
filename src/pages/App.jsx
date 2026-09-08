@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/apiConfig.js";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import useRouteStore from "../stores/routeStore.js";
 //please work
 export default function Auth() {
@@ -8,8 +8,15 @@ export default function Auth() {
   const [notification, setNotification] = useState(null);
   const [startLogin, setStartLogin] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const setRoutes = useRouteStore((state) => state.setRoutes);
+
+  useEffect(() => {
+    if (location.state?.notification) {
+      setNotification(location.state.notification);
+    }
+  }, [location.state]);
 
   const [form, setForm] = useState({
     email: "",
@@ -279,11 +286,11 @@ export default function Auth() {
                 I forgot my Password
               </div>
             </NavLink>
-            <NavLink to="/signup">
+            {/* <NavLink to="/signup">
               <div className="text-sm text-green-700  cursor-pointer hover:underline">
                 No account? Signup
               </div>
-            </NavLink>
+            </NavLink> */}
           </form>
         </div>
       </div>

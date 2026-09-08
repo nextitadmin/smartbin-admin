@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/SuperAdmin/Sidebar";
 import Topbar from "../components/SuperAdmin/Topbar";
+import api from "../api/apiConfig";
 
 // --- Helper Functions ---
 
@@ -115,8 +116,6 @@ const MonthTimeSelect = () => {
   );
 };
 
-// --- Mock Data and API Simulation (Unchanged) ---
-
 const pendingBillsColumns = [
   { key: "sn", label: "S/N", sortable: true },
   { key: "billId", label: "Bill ID", sortable: true },
@@ -139,72 +138,19 @@ const paymentsColumns = [
   { key: "action", label: "Action", sortable: false },
 ];
 
-// Generate mock data for Pending Bills
-const MOCK_PENDING_BILLS = Array.from({ length: 15 }, (_, i) => ({
-  sn: i + 1,
-  billId: `#OD1258904${i}`,
-  name: "Olabankole Kolawole",
-  payId: `N-1465${6 + i}`,
-  service: "Waste Bin Disposal",
-  amount: (3500 + i * 1000).toFixed(2),
-  status: "Pending",
-  // Based on design, only one row has 'Make Payment'
-  action: i === 4 ? "Make Payment" : "View bill",
-  // Add multiple payment items for bills
-  paymentItems: [
-    {
-      description: "Waste Bin Disposal Service",
-      amount: 3500 + i * 1000
-    },
-    // { 
-    //     description: 'Environmental compliance fee', 
-    //     amount: 1500 + i * 200 
-    // },
-    // { 
-    //     description: 'Service maintenance fee', 
-    //     amount: 800 + i * 150 
-    // }
-  ],
-}));
+// --- Data Fetching ---
 
-// Generate mock data for Payments
-const MOCK_PAYMENTS = Array.from({ length: 15 }, (_, i) => ({
-  sn: i + 1,
-  paymentId: `PAY-${String(i + 1).padStart(3, '0')}`, // Match Receipt component format
-  revenueSource: i % 3 === 0 ? "Waste Collection" : "Smart Bin purchase",
-  amount: (20000 + i * 50).toFixed(2),
-  date: `26-06-23`,
-  paymentMethod: i % 2 === 0 ? "Alat by Wema" : "In-app wallet",
-  status: "Successful",
-  action: "View receipt",
-  // Additional fields needed for Receipt component
-  recipientName: `Customer ${i + 1}`,
-  transactionId: `TXN-${String(i + 1).padStart(3, '0')}-2025`,
-  transactionRef: `REF-${String(i + 1).padStart(3, '0')}-2025`,
-  phoneNumber: `+234 80${i + 1} ${String(Math.floor(Math.random() * 1000)).padStart(3, '0')} ${String(Math.floor(Math.random() * 10000)).padStart(3, '0')}`,
-  transactionDate: new Date().toLocaleString(),
-  address: `${100 + i} Main Street, Lagos`,
-  paymentItems: [
-    {
-      description: i % 3 === 0 ? "Waste Collection Service" : "Smart Bin purchase",
-      amount: 20000 + i * 50
-    }
-  ],
-  currencySymbol: "₦",
-  amountInWords: numberToWordsNaira(20000 + i * 50),
-}));
-
-// Function to simulate API call returning a promise
-const fetchData = (type) =>
-  new Promise((resolve) => {
-    setTimeout(() => {
-      if (type === "bills") {
-        resolve(MOCK_PENDING_BILLS);
-      } else {
-        resolve(MOCK_PAYMENTS);
-      }
-    }, 500); // Simulate network delay
-  });
+const fetchData = async (type) => {
+  try {
+    const endpoint = type === "bills" ? "/lawma/superadmins/reconciliation/bills" : "/lawma/superadmins/reconciliation/payments";
+    const response = await api.get(endpoint);
+    const result = response?.data?.data ?? response?.data ?? [];
+    return Array.isArray(result) ? result : [];
+  } catch (error) {
+    console.error(`Error fetching reconciliation ${type}:`, error);
+    return [];
+  }
+};
 
 // --- Table Component (Handles Sorting and Rendering) ---
 
@@ -263,7 +209,7 @@ const ReconciliationTable = ({ columns, tabType }) => {
           transactionId: row.billId,
           paymentId: row.billId,
           transactionRef: row.billId,
-          phoneNumber: `+234 80${Math.floor(Math.random() * 1000000000)}`, // Generate random phone
+          phoneNumber: row.phoneNumber || row.phone || "N/A",
           transactionDate: new Date().toLocaleString(),
           paymentItems: row.paymentItems || [
             {
@@ -275,7 +221,7 @@ const ReconciliationTable = ({ columns, tabType }) => {
           amountInWords: row.paymentItems ?
             numberToWordsNaira(row.paymentItems.reduce((sum, item) => sum + item.amount, 0)) :
             numberToWordsNaira(parseFloat(row.amount)),
-          address: "Lagos, Nigeria", // Default address
+          address: row.address || "N/A",
           paymentMethod: "Pending Payment",
           status: row.status
         };
@@ -545,22 +491,25 @@ const ReconciliationTable = ({ columns, tabType }) => {
 // --- Summary Cards Component ---
 
 const SummaryCards = () => {
-  // Updated mock data values and colors to match the design (Payment made is green)
   const cards = [
-    { title: "Unpaid bills", value: "1,240", isCurrency: false, valueColor: "text-green-700" },
+    { title: "Unpaid bills", value: "0", isCurrency: false, valueColor: "text-green-700" },
     {
       title: "Amount of unpaid bills",
-      value: "30,000",
+      value: "0",
       valueColor: "text-green-700",
       isCurrency: true,
     },
     {
       title: "Payment made",
-      value: "30,000",
+      value: "0",
       valueColor: "text-green-700",
       isCurrency: true,
-      subtitle: "₦850k ₦150k",
-      subtitles: "Bin purchase Waste disposal",
+    },
+    {
+      title: "Total generated",
+      value: "0",
+      valueColor: "text-green-700",
+      isCurrency: true,
     },
   ];
 

@@ -5,7 +5,6 @@ import Papa from "papaparse";
 import api from "../api/apiConfig";
 import Sidebar from "../components/SuperAdmin/Sidebar";
 import Topbar from "../components/SuperAdmin/Topbar";
-import pspRevenueData from "../mock/pspRevenueData";
 
 import { ExportIcon, SearchIcon, ChevronLeftIcon, ChevronRightIcon } from "../components/icons";
 
@@ -132,23 +131,12 @@ export default function PSPRevenue() {
         // Extract total records for page count
         const totalRecords = response?.data?.totalCount ?? response?.data?.total ?? response?.data?.meta?.total ?? response?.data?.meta?.totalCount ?? (Array.isArray(raw) ? raw.length : 0);
 
-        if (normalized.length > 0) {
-          setRows(normalized);
-          setApiTotalPages(Math.max(1, Math.ceil(totalRecords / itemsPerPage)));
-        } else {
-          // If empty, fallback to mock data sliced locally
-          const start = (currentPage - 1) * itemsPerPage;
-          const end = start + itemsPerPage;
-          setRows(pspRevenueData.slice(start, end).map(normalizePSPRevenueRow));
-          setApiTotalPages(Math.max(1, Math.ceil(pspRevenueData.length / itemsPerPage)));
-        }
+        setRows(normalized);
+        setApiTotalPages(Math.max(1, Math.ceil(totalRecords / itemsPerPage)));
       } catch (error) {
         console.error("Error fetching PSP revenue:", error);
-        // Fallback to mock data sliced locally on error
-        const start = (currentPage - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        setRows(pspRevenueData.slice(start, end).map(normalizePSPRevenueRow));
-        setApiTotalPages(Math.max(1, Math.ceil(pspRevenueData.length / itemsPerPage)));
+        setRows([]);
+        setApiTotalPages(1);
       } finally {
         setLoading(false);
       }

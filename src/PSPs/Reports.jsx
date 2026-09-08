@@ -3,7 +3,7 @@ import Sidebar from '../components/PSPs/Sidebar';
 import Topbar from '../components/PSPs/Topbar';
 import api from '../api/apiConfig';
 import { useNavigate } from 'react-router-dom';
-// import demoReports from '../data/demoReports';
+
 import SkeletonLoader from '../components/SkeletonLoader';
 import {
     PlusIcon,
@@ -101,24 +101,7 @@ const ReportsPage = () => {
     };
     const fetchReportsAPI = useCallback(async () => {
         setIsLoading(true);
-        // Check if we're in development mode
-        // if (process.env.NODE_ENV === 'development') {
-        //     // Use demo data in development with 2 second delay
-        //     setIsLoading(true);
-        //     await new Promise(resolve => setTimeout(resolve, 2000));
 
-        //     const reportList = demoReports.map((item) => ({
-        //         id: item._id,
-        //         reportType: item.type,
-        //         reportTitle: item.reportName,
-        //         period: formatPeriodArrow(item.period),
-        //         generationDate: item.createdAt
-        //     }));
-
-        //     setReports(reportList);
-        //     setIsLoading(false);
-        //     return;
-        // }
 
         // Production API call
         try {

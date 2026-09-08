@@ -50,216 +50,63 @@ const PaymentReceipt = () => {
     const [receiptData, setReceiptData] = useState({});
     const [loading, setLoading] = useState(true);
 
-    // Mock payment data that matches the Payments.jsx data structure
-    const mockPaymentData = {
-        "PAY-001": {
-            recipientName: "Adetutu James",
-            transactionId: "TXN-001-2025",
-            paymentId: "PAY-001",
-            transactionRef: "REF-001-2025",
-            phoneNumber: "+234 801 234 5678",
-            transactionDate: "26-05-2025 10:30:00",
-            paymentItems: [
-                { description: "Smart bin service fee", amount: 15000 }
-            ],
-            currencySymbol: "₦",
-            amountInWords: "Fifteen Thousand Naira Only",
-            address: "123 Victoria Island, Lagos",
-            paymentMethod: "Bank Transfer",
-            status: "Completed"
-        },
-        "PAY-002": {
-            recipientName: "John Doe",
-            transactionId: "TXN-002-2025",
-            paymentId: "PAY-002",
-            transactionRef: "REF-002-2025",
-            phoneNumber: "+234 802 345 6789",
-            transactionDate: "28-05-2025 14:15:00",
-            paymentItems: [
-                { description: "Monthly subscription", amount: 25000 }
-            ],
-            currencySymbol: "₦",
-            amountInWords: "Twenty Five Thousand Naira Only",
-            address: "456 Ikoyi, Lagos",
-            paymentMethod: "Card Payment",
-            status: "Pending"
-        },
-        "PAY-003": {
-            recipientName: "Jane Smith",
-            transactionId: "TXN-003-2025",
-            paymentId: "PAY-003",
-            transactionRef: "REF-003-2025",
-            phoneNumber: "+234 803 456 7890",
-            transactionDate: "30-05-2025 09:45:00",
-            paymentItems: [
-                { description: "Service fee", amount: 18000 }
-            ],
-            currencySymbol: "₦",
-            amountInWords: "Eighteen Thousand Naira Only",
-            address: "789 Lekki, Lagos",
-            paymentMethod: "Alat by Wema",
-            status: "Completed"
-        },
-        "PAY-004": {
-            recipientName: "Mike Johnson",
-            transactionId: "TXN-004-2025",
-            paymentId: "PAY-004",
-            transactionRef: "REF-004-2025",
-            phoneNumber: "+234 804 567 8901",
-            transactionDate: "01-06-2025 11:20:00",
-            paymentItems: [
-                { description: "Quarterly payment", amount: 32000 }
-            ],
-            currencySymbol: "₦",
-            amountInWords: "Thirty Two Thousand Naira Only",
-            address: "321 Surulere, Lagos",
-            paymentMethod: "Bank Transfer",
-            status: "Failed"
-        },
-        "PAY-005": {
-            recipientName: "Sarah Wilson",
-            transactionId: "TXN-005-2025",
-            paymentId: "PAY-005",
-            transactionRef: "REF-005-2025",
-            phoneNumber: "+234 805 678 9012",
-            transactionDate: "03-06-2025 16:45:00",
-            paymentItems: [
-                { description: "Maintenance fee", amount: 12000 }
-            ],
-            currencySymbol: "₦",
-            amountInWords: "Twelve Thousand Naira Only",
-            address: "654 Yaba, Lagos",
-            paymentMethod: "Card Payment",
-            status: "Completed"
-        },
-        "PAY-006": {
-            recipientName: "David Brown",
-            transactionId: "TXN-006-2025",
-            paymentId: "PAY-006",
-            transactionRef: "REF-006-2025",
-            phoneNumber: "+234 806 789 0123",
-            transactionDate: "05-06-2025 08:30:00",
-            paymentItems: [
-                { description: "Installation fee", amount: 22000 }
-            ],
-            currencySymbol: "₦",
-            amountInWords: "Twenty Two Thousand Naira Only",
-            address: "987 Ikeja, Lagos",
-            paymentMethod: "Alat by Wema",
-            status: "Pending"
-        },
-        "PAY-007": {
-            recipientName: "Lisa Davis",
-            transactionId: "TXN-007-2025",
-            paymentId: "PAY-007",
-            transactionRef: "REF-007-2025",
-            phoneNumber: "+234 807 890 1234",
-            transactionDate: "07-06-2025 13:15:00",
-            paymentItems: [
-                { description: "Service upgrade", amount: 28000 }
-            ],
-            currencySymbol: "₦",
-            amountInWords: "Twenty Eight Thousand Naira Only",
-            address: "147 Gbagada, Lagos",
-            paymentMethod: "Bank Transfer",
-            status: "Completed"
-        },
-        "PAY-008": {
-            recipientName: "Robert Taylor",
-            transactionId: "TXN-008-2025",
-            paymentId: "PAY-008",
-            transactionRef: "REF-008-2025",
-            phoneNumber: "+234 808 901 2345",
-            transactionDate: "10-06-2025 09:00:00",
-            paymentItems: [
-                { description: "Monthly subscription", amount: 19500 }
-            ],
-            currencySymbol: "₦",
-            amountInWords: "Nineteen Thousand Five Hundred Naira Only",
-            address: "258 Victoria Island, Lagos",
-            paymentMethod: "Card Payment",
-            status: "Completed"
-        },
-        "PAY-009": {
-            recipientName: "Grace Okafor",
-            transactionId: "TXN-009-2025",
-            paymentId: "PAY-009",
-            transactionRef: "REF-009-2025",
-            phoneNumber: "+234 809 012 3456",
-            transactionDate: "12-06-2025 15:30:00",
-            paymentItems: [
-                { description: "Service fee", amount: 31000 }
-            ],
-            currencySymbol: "₦",
-            amountInWords: "Thirty One Thousand Naira Only",
-            address: "369 Ikoyi, Lagos",
-            paymentMethod: "Alat by Wema",
-            status: "Failed"
-        },
-        "PAY-010": {
-            recipientName: "Emmanuel Adebayo",
-            transactionId: "TXN-010-2025",
-            paymentId: "PAY-010",
-            transactionRef: "REF-010-2025",
-            phoneNumber: "+234 810 123 4567",
-            transactionDate: "15-06-2025 12:00:00",
-            paymentItems: [
-                { description: "Installation fee", amount: 27500 }
-            ],
-            currencySymbol: "₦",
-            amountInWords: "Twenty Seven Thousand Five Hundred Naira Only",
-            address: "741 Lekki, Lagos",
-            paymentMethod: "Bank Transfer",
-            status: "Completed"
-        }
-    };
-
     const fetchData = async () => {
         const currentId = localStorage.getItem('paymentId');
+        const paymentDataString = localStorage.getItem('paymentData');
         console.log('Payment ID from localStorage:', currentId);
         setLoading(true);
         
         try {
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            let receiptData;
             
-            // Use mock data if available, otherwise use default
-            const mockData = mockPaymentData[currentId] || {
-                recipientName: "Customer Name",
-                transactionId: currentId ? `TXN-${currentId}` : "TXN-UNKNOWN",
-                paymentId: currentId || "PAY-UNKNOWN",
-                transactionRef: currentId ? `REF-${currentId}` : "REF-UNKNOWN",
-                phoneNumber: "+234 800 000 0000",
-                transactionDate: new Date().toLocaleString(),
-                paymentItems: [
-                    { description: "Payment for services", amount: 0 }
-                ],
-                currencySymbol: "₦",
-                amountInWords: "Zero Naira Only",
-                address: "Address not available",
-                paymentMethod: "Unknown",
-                status: "Unknown"
-            };
+            if (paymentDataString) {
+                const parsedData = JSON.parse(paymentDataString);
+                receiptData = {
+                    recipientName: parsedData.customerName || parsedData.recipientName || "N/A",
+                    transactionId: parsedData.transactionId || (currentId ? `TXN-${currentId}` : "N/A"),
+                    paymentId: parsedData.paymentId || parsedData.paymentID || currentId || "N/A",
+                    transactionRef: parsedData.transactionRef || (currentId ? `REF-${currentId}` : "N/A"),
+                    phoneNumber: parsedData.phoneNumber || "N/A",
+                    transactionDate: parsedData.paymentDate || parsedData.transactionDate || new Date().toLocaleString(),
+                    paymentItems: parsedData.paymentItems || (parsedData.amount ? [{ description: "Payment for services", amount: parsedData.amount }] : []),
+                    currencySymbol: parsedData.currencySymbol || "₦",
+                    amountInWords: parsedData.amountInWords || (parsedData.amount ? numberToWords(parsedData.amount) : "Zero Naira Only"),
+                    address: parsedData.address || "N/A",
+                    paymentMethod: parsedData.paymentMethod || "N/A",
+                    status: parsedData.status || "N/A"
+                };
+            } else {
+                receiptData = {
+                    recipientName: "N/A",
+                    transactionId: currentId ? `TXN-${currentId}` : "N/A",
+                    paymentId: currentId || "N/A",
+                    transactionRef: currentId ? `REF-${currentId}` : "N/A",
+                    phoneNumber: "N/A",
+                    transactionDate: new Date().toLocaleString(),
+                    paymentItems: [],
+                    currencySymbol: "₦",
+                    amountInWords: "Zero Naira Only",
+                    address: "N/A",
+                    paymentMethod: "N/A",
+                    status: "N/A"
+                };
+            }
             
-            console.log('Setting receipt data:', mockData);
-            setReceiptData(mockData);
+            setReceiptData(receiptData);
         } catch (error) {
             console.log("Error fetching receipt data:", error);
-            // Set default data on error
             setReceiptData({
-                recipientName: "Customer Name",
-                transactionId: "TXN-ERROR",
-                paymentId: currentId || "PAY-ERROR",
-                transactionRef: "REF-ERROR",
-                phoneNumber: "+234 800 000 0000",
+                recipientName: "N/A",
+                transactionId: "N/A",
+                paymentId: currentId || "N/A",
+                transactionRef: "N/A",
+                phoneNumber: "N/A",
                 transactionDate: new Date().toLocaleString(),
-                paymentItems: [
-                    { description: "Payment for services", amount: 0 }
-                ],
+                paymentItems: [],
                 currencySymbol: "₦",
                 amountInWords: "Zero Naira Only",
-                address: "Address not available",
-                paymentMethod: "Unknown",
+                address: "N/A",
+                paymentMethod: "N/A",
                 status: "Error"
             });
         } finally {

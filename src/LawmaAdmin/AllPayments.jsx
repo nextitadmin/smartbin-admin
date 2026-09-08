@@ -4,19 +4,7 @@ import Sidebar from '../components/LawmaAdmin/Sidebar';
 import Topbar from '../components/LawmaAdmin/Topbar';
 import Papa from 'papaparse';
 
-// --- Mock Data for Payments ---
-const mockPaymentData = [
-    { id: 1, paymentId: '#OD12589048', revenueSource: 'Waste Collection', amount: 20000, date: '2025-05-26', paymentMethod: 'Alat by Wema', status: 'Successful' },
-    { id: 2, paymentId: '#OD12589049', revenueSource: 'Smart Bin purchase', amount: 20000, date: '2025-05-26', paymentMethod: 'In app wallet', status: 'Successful' },
-    { id: 3, paymentId: '#OD12589050', revenueSource: 'Waste Collection', amount: 20000, date: '2025-05-26', paymentMethod: 'In app wallet', status: 'Failed' },
-    { id: 4, paymentId: '#OD12589051', revenueSource: 'Waste Collection', amount: 20000, date: '2025-05-26', paymentMethod: 'Alat by Wema', status: 'Pending' },
-    { id: 5, paymentId: '#OD12589052', revenueSource: 'Smart Bin purchase', amount: 20000, date: '2025-05-26', paymentMethod: 'Alat by Wema', status: 'Successful' },
-    { id: 6, paymentId: '#OD12589053', revenueSource: 'Waste Disposal', amount: 15000, date: '2025-05-25', paymentMethod: 'Card', status: 'Successful' },
-    { id: 7, paymentId: '#OD12589054', revenueSource: 'Smart Bin purchase', amount: 75000, date: '2025-05-24', paymentMethod: 'In app wallet', status: 'Pending' },
-    { id: 8, paymentId: '#OD12589055', revenueSource: 'Waste Collection', amount: 22000, date: '2025-05-23', paymentMethod: 'Alat by Wema', status: 'Failed' },
-    { id: 9, paymentId: '#OD12589056', revenueSource: 'Waste Collection', amount: 18000, date: '2025-05-22', paymentMethod: 'Card', status: 'Successful' },
-    { id: 10, paymentId: '#OD12589057', revenueSource: 'Smart Bin purchase', amount: 50000, date: '2025-05-21', paymentMethod: 'Alat by Wema', status: 'Successful' },
-];
+
 
 // --- Status Badge Component ---
 const StatusBadge = ({ status }) => {
@@ -226,15 +214,10 @@ export default function AllPayments() {
     const statuses = getUniqueValues('status');
     const dates = getUniqueValues('date');
 
-    // Mock API call to fetch data
     useEffect(() => {
         setLoading(true);
-        const timer = setTimeout(() => {
-            setAllPayments(mockPaymentData);
-            setLoading(false);
-        }, 1500); // Simulate network delay
-
-        return () => clearTimeout(timer);
+        setAllPayments([]);
+        setLoading(false);
     }, []);
 
     // Apply search when search term changes

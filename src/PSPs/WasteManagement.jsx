@@ -17,109 +17,14 @@ const XMarkIcon = () => (
 );
 
 
-// --- MOCK API DATA ---
-const mockScheduledPickups = [
-    { 
-        id: '#OD12589048', 
-        customerName: 'Adebola Ade', 
-        phone: '+234 801 234 5678',
-        email: 'adebola.ade@email.com',
-        address: '12, Awolowo Road, Ikoyi, Lagos', 
-        lga: 'Eti-Osa LGA', 
-        lcda: 'Ikoyi LCDA',
-        pspTeam: 'Adenike James', 
-        fillLevel: '97%',
-        note: 'Please collect early morning as bin is almost full'
-    },
-    { 
-        id: '#OD12589049', 
-        customerName: 'Falomo Jide', 
-        phone: '+234 802 345 6789',
-        email: 'falomo.jide@email.com',
-        address: '45, Oguntana Drive, Surulere, Lagos', 
-        lga: 'Surulere LGA', 
-        lcda: 'Surulere LCDA',
-        pspTeam: 'Adenike James', 
-        fillLevel: '75%',
-        note: 'Gate access code: 1234'
-    },
-    { 
-        id: '#OD12589050', 
-        customerName: 'Babatunde Shina', 
-        phone: '+234 803 456 7890',
-        email: 'babatunde.shina@email.com',
-        address: '4, Bode Thomas Street, Surulere, Lagos', 
-        lga: 'Surulere LGA', 
-        lcda: 'Surulere LCDA',
-        pspTeam: 'Adenike James', 
-        fillLevel: '35%',
-        note: 'Contact security before entry'
-    },
-    { 
-        id: '#OD12589051', 
-        customerName: 'Fatimo Adetola', 
-        phone: '+234 804 567 8901',
-        email: 'fatimo.adetola@email.com',
-        address: '8, Akin Adedeji Street, Victoria Island, Lagos', 
-        lga: 'Eti-Osa LGA', 
-        lcda: 'Victoria Island LCDA',
-        pspTeam: '7th Jun, 2025', 
-        fillLevel: '35%',
-        note: 'Building has restricted access, call before arrival'
-    },
-    { 
-        id: '#OD12589052', 
-        customerName: 'Chinedu Okoro', 
-        phone: '+234 805 678 9012',
-        email: 'chinedu.okoro@email.com',
-        address: '15, Allen Avenue, Ikeja, Lagos', 
-        lga: 'Ikeja LGA', 
-        lcda: 'Ikeja LCDA',
-        pspTeam: 'Babatunde Toba', 
-        fillLevel: '80%',
-        note: 'Please use service entrance at the back'
-    },
-    { 
-        id: '#OD12589053', 
-        customerName: 'Grace Okafor', 
-        phone: '+234 806 789 0123',
-        email: 'grace.okafor@email.com',
-        address: '22, Admiralty Way, Lekki, Lagos', 
-        lga: 'Eti-Osa LGA', 
-        lcda: 'Lekki LCDA',
-        pspTeam: 'Adenike James', 
-        fillLevel: '60%',
-        note: 'Gate opens at 8 AM, contact if earlier pickup needed'
-    },
-];
+const scheduledPickups = [];
+const assignedPickups = [];
+const completedPickups = [];
+const pspTeamMembers = [];
 
-const mockAssignedPickups = [
-    { id: '#OD12589054', name: 'Chibuikem Nkeonye', address: '12, Awolowo Road, Ikoyi, Lagos', assignedTo: 'Babatunde Toba', dateAssigned: '09/08/2023 2:33PM' },
-    { id: '#OD12589055', name: 'Aisha Mohammed', address: '45, Oguntana Drive, Surulere, Lagos', assignedTo: 'Adenike James', dateAssigned: '10/08/2023 9:15AM' },
-    { id: '#OD12589056', name: 'Emmanuel Okafor', address: '4, Bode Thomas Street, Surulere, Lagos', assignedTo: 'Babatunde Toba', dateAssigned: '11/08/2023 1:45PM' },
-    { id: '#OD12589057', name: 'Kemi Adebayo', address: '8, Akin Adedeji Street, Victoria Island, Lagos', assignedTo: 'Adenike James', dateAssigned: '12/08/2023 3:20PM' },
-];
-
-const mockCompletedPickups = [
-    { id: '#OD12589058', name: 'Oluwaseun Adeyemi', address: '12, Awolowo Road, Ikoyi, Lagos', assignedTo: 'Babatunde Toba', dateCompleted: '09/08/2023 2:33PM' },
-    { id: '#OD12589059', name: 'Funmi Olatunji', address: '45, Oguntana Drive, Surulere, Lagos', assignedTo: 'Adenike James', dateCompleted: '10/08/2023 4:15PM' },
-];
-
-const mockPSPTeamMembers = [
-    { id: 1, name: 'Adenike James', email: 'adenike.james@psp.com', phone: '+234 801 234 5678', status: 'Available' },
-    { id: 2, name: 'Babatunde Toba', email: 'babatunde.toba@psp.com', phone: '+234 802 345 6789', status: 'Available' },
-    { id: 3, name: 'Chinedu Okoro', email: 'chinedu.okoro@psp.com', phone: '+234 803 456 7890', status: 'Busy' },
-    { id: 4, name: 'Fatima Ibrahim', email: 'fatima.ibrahim@psp.com', phone: '+234 804 567 8901', status: 'Available' },
-    { id: 5, name: 'Emmanuel Okafor', email: 'emmanuel.okafor@psp.com', phone: '+234 805 678 9012', status: 'Available' },
-    { id: 6, name: 'Grace Adebayo', email: 'grace.adebayo@psp.com', phone: '+234 806 789 0123', status: 'Busy' },
-    { id: 7, name: 'Ibrahim Mohammed', email: 'ibrahim.mohammed@psp.com', phone: '+234 807 890 1234', status: 'Available' },
-    { id: 8, name: 'Kemi Adesanya', email: 'kemi.adesanya@psp.com', phone: '+234 808 901 2345', status: 'Available' },
-];
-
-// --- MOCK API FETCH FUNCTIONS ---
-const fetchScheduledPickups = () => new Promise(resolve => setTimeout(() => resolve(mockScheduledPickups), 500));
-const fetchAssignedPickups = () => new Promise(resolve => setTimeout(() => resolve(mockAssignedPickups), 500));
-const fetchCompletedPickups = () => new Promise(resolve => setTimeout(() => resolve(mockCompletedPickups), 500));
+const fetchScheduledPickups = () => Promise.resolve(scheduledPickups);
+const fetchAssignedPickups = () => Promise.resolve(assignedPickups);
+const fetchCompletedPickups = () => Promise.resolve(completedPickups);
 
 
 // --- HELPER HOOK for sorting ---
@@ -313,7 +218,7 @@ const AssignTeamMemberModal = ({ isOpen, onClose, onBack, pickup, onAssignSucces
         console.log('Assigning member:', { selectedMember, email, comment, pickup });
         
         // Get the selected member's name for the notification
-        const member = mockPSPTeamMembers.find(m => m.id.toString() === selectedMember);
+        const member = pspTeamMembers.find(m => m.id.toString() === selectedMember);
         const memberName = member ? member.name : 'Unknown Member';
         
         // Trigger success notification
@@ -330,7 +235,7 @@ const AssignTeamMemberModal = ({ isOpen, onClose, onBack, pickup, onAssignSucces
     const handleMemberChange = (e) => {
         const memberId = e.target.value;
         setSelectedMember(memberId);
-        const member = mockPSPTeamMembers.find(m => m.id.toString() === memberId);
+        const member = pspTeamMembers.find(m => m.id.toString() === memberId);
         if (member) {
             setEmail(member.email);
         }
@@ -370,7 +275,7 @@ const AssignTeamMemberModal = ({ isOpen, onClose, onBack, pickup, onAssignSucces
                                     className="w-full px-4 py-2.5 border border-zinc-200 rounded-md appearance-none bg-white"
                                 >
                                     <option value="">Choose a team member</option>
-                                    {mockPSPTeamMembers.map(member => (
+                                    {pspTeamMembers.map(member => (
                                         <option key={member.id} value={member.id}>
                                             {member.name} - {member.status}
                                         </option>
@@ -860,15 +765,15 @@ export default function WasteManagement() {
 
             switch (activeTab) {
                 case 'Scheduled pickups':
-                    data = mockScheduledPickups;
+                    data = scheduledPickups;
                     headers = ['S/N', 'Waste ID', 'Customer Name', 'Phone', 'Email', 'Address', 'LGA', 'LCDA', 'PSP Team', 'Fill Level', 'Note'];
                     break;
                 case 'Assigned':
-                    data = mockAssignedPickups;
+                    data = assignedPickups;
                     headers = ['S/N', 'Waste ID', 'Name', 'Address', 'Assigned To', 'Date Assigned'];
                     break;
                 case 'Completed':
-                    data = mockCompletedPickups;
+                    data = completedPickups;
                     headers = ['S/N', 'Waste ID', 'Name', 'Address', 'Assigned To', 'Date Completed'];
                     break;
                 default:

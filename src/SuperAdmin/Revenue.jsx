@@ -4,22 +4,20 @@ import api from '../api/apiConfig';
 import Sidebar from '../components/SuperAdmin/Sidebar';
 import Topbar from '../components/SuperAdmin/Topbar';
 import PaymentTable from '../components/SuperAdmin/PaymentTable';
-import pspRevenueData from '../mock/pspRevenueData';
-
-// --- MOCK DATA FALLBACKS ---
+// --- Chart Data Defaults ---
 const initialChartData = [
-    { name: 'Jan', revenue: 12000000 },
-    { name: 'Feb', revenue: 18000000 },
-    { name: 'Mar', revenue: 15000000 },
-    { name: 'Apr', revenue: 28000000 },
-    { name: 'May', revenue: 35000000 },
-    { name: 'Jun', revenue: 32000000 },
-    { name: 'Jul', revenue: 41000000 },
-    { name: 'Aug', revenue: 48000000 },
-    { name: 'Sep', revenue: 40000000 },
-    { name: 'Oct', revenue: 25000000 },
-    { name: 'Nov', revenue: 28000000 },
-    { name: 'Dec', revenue: 38000000 },
+    { name: 'Jan', revenue: 0 },
+    { name: 'Feb', revenue: 0 },
+    { name: 'Mar', revenue: 0 },
+    { name: 'Apr', revenue: 0 },
+    { name: 'May', revenue: 0 },
+    { name: 'Jun', revenue: 0 },
+    { name: 'Jul', revenue: 0 },
+    { name: 'Aug', revenue: 0 },
+    { name: 'Sep', revenue: 0 },
+    { name: 'Oct', revenue: 0 },
+    { name: 'Nov', revenue: 0 },
+    { name: 'Dec', revenue: 0 },
 ];
 
 const ChevronDownIcon = ({ className = "w-5 h-5" }) => (
@@ -220,44 +218,24 @@ export default function Revenue() {
                     };
                 });
 
-                if (mapped.length > 0) {
-                    setPaymentDetails(mapped);
-                    setTotalPages(paging.totalPages ?? Math.max(1, Math.ceil((paging.totalRecords ?? rawList.length) / limit)));
-                } else {
-                    // Fallback to mock data sliced for the current page
-                    const start = (currentPage - 1) * limit;
-                    const end = start + limit;
-                    const mockedMapped = pspRevenueData.slice(start, end).map((item, index) => ({
-                        ...normalizePSPRevenueRow(item, index),
-                        s_n: start + index + 1
-                    }));
-                    setPaymentDetails(mockedMapped);
-                    setTotalPages(Math.max(1, Math.ceil(pspRevenueData.length / limit)));
-                }
+                setPaymentDetails(mapped);
+                setTotalPages(paging.totalPages ?? Math.max(1, Math.ceil((paging.totalRecords ?? rawList.length) / limit)));
 
             } catch (error) {
                 console.error("Error fetching revenue analysis data:", error);
                 if (!active) return;
                 
-                // Fallback state on error
                 setStats({
-                    totalAmountGenerated: 803053000,
-                    smartBin: { amount: 100000, transactions: 1 },
-                    wasteDisposal: { amount: 400000, transactions: 4 },
-                    chartTotalRevenue: 803053000,
+                    totalAmountGenerated: 0,
+                    smartBin: { amount: 0, transactions: 0 },
+                    wasteDisposal: { amount: 0, transactions: 0 },
+                    chartTotalRevenue: 0,
                     growthPercentage: 0,
                     comparisonText: "vs Last Year"
                 });
                 setChartData(initialChartData);
-                
-                const start = (currentPage - 1) * limit;
-                const end = start + limit;
-                const mockedMapped = pspRevenueData.slice(start, end).map((item, index) => ({
-                    ...normalizePSPRevenueRow(item, index),
-                    s_n: start + index + 1
-                }));
-                setPaymentDetails(mockedMapped);
-                setTotalPages(Math.max(1, Math.ceil(pspRevenueData.length / limit)));
+                setPaymentDetails([]);
+                setTotalPages(1);
             } finally {
                 if (active) {
                     setLoading(false);

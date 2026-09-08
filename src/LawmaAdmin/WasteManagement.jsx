@@ -17,65 +17,7 @@ const WasteManagement = () => {
     address: "",
   });
 
-  // Mock Data (fallback)
-  const mockData = [
-    {
-      id: 1,
-      wasteId: "#OD12589048",
-      date: "21-01-25",
-      address: "12, Awolowo Road, Ikoyi, Lagos",
-      representative: "",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      wasteId: "#OD12589048",
-      date: "21-01-25",
-      address: "45, Ogunlana Drive, Surulere, Lagos",
-      representative: "Falomo Jide",
-      status: "Picked up",
-    },
-    {
-      id: 3,
-      wasteId: "#OD12589048",
-      date: "21-01-25",
-      address: "4, Bode Thomas Street, Surulere, Lagos",
-      representative: "",
-      status: "Pending",
-    },
-    {
-      id: 4,
-      wasteId: "#OD12589048",
-      date: "21-01-25",
-      address: "8, Akin Adesola Street, Victoria Island, Lagos",
-      representative: "Fatimo Adetola",
-      status: "Picked up",
-    },
-    {
-      id: 5,
-      wasteId: "#OD12589048",
-      date: "21-01-25",
-      address: "8, Akin Adesola Street, Victoria Island, Lagos",
-      representative: "Chiduke Uchenna",
-      status: "Picked up",
-    },
-    {
-      id: 6,
-      wasteId: "#OD12589048",
-      date: "21-01-25",
-      address: "8, Akin Adesola Street, Victoria Island, Lagos",
-      representative: "Mattias Piaus",
-      status: "Picked up",
-    },
-  ];
 
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setWasteData(mockData);
-      setFilteredData(mockData);
-    }, 500);
-  }, []);
 
   // Apply search and filters
   useEffect(() => {

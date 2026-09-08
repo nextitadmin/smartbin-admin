@@ -12,12 +12,17 @@ const useSuperAdminStore = create((set) => ({
   // Set user data from API response
   setUser: (userData) => set({ 
     profile: {
-      id: userData.id,
+      id: userData.id || userData._id,
       email: userData.email,
       name: userData.name,
+      role: userData.role,
+      token: userData.token,
+      ipAddress: userData.ipAddress,
+      userAgent: userData.userAgent,
       emailVerified: userData.emailVerified,
       createdAt: userData.createdAt,
-      updatedAt: userData.updatedAt
+      updatedAt: userData.updatedAt,
+      ...userData,
     }
   }),
   

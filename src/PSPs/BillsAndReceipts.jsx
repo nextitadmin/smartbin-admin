@@ -20,108 +20,7 @@ const ArrowRightIcon = (props) => (
 
 
 
-// Demo Data for Bills
-const demoBills = [
-    {
-        id: 1,
-        billNumber: 'BILL-001',
-        customerName: 'John Doe',
-        address: '123 Victoria Island, Lagos',
-        phone: '+234 801 234 5678',
-        amount: 15000,
-        status: 'Outstanding',
-        dueDate: '2024-01-15',
-        createdAt: '2024-01-01'
-    },
-    {
-        id: 2,
-        billNumber: 'BILL-002',
-        customerName: 'Jane Smith',
-        address: '456 Ikoyi, Lagos',
-        phone: '+234 802 345 6789',
-        amount: 25000,
-        status: 'Paid',
-        dueDate: '2024-01-10',
-        createdAt: '2024-01-02'
-    },
-    {
-        id: 3,
-        billNumber: 'BILL-003',
-        customerName: 'Mike Johnson',
-        address: '789 Lekki Phase 1, Lagos',
-        phone: '+234 803 456 7890',
-        amount: 18000,
-        status: 'Overdue',
-        dueDate: '2023-12-20',
-        createdAt: '2023-12-15'
-    },
-    {
-        id: 4,
-        billNumber: 'BILL-004',
-        customerName: 'Sarah Wilson',
-        address: '321 Surulere, Lagos',
-        phone: '+234 804 567 8901',
-        amount: 32000,
-        status: 'Paid',
-        dueDate: '2024-01-05',
-        createdAt: '2023-12-28'
-    },
-    {
-        id: 5,
-        billNumber: 'BILL-005',
-        customerName: 'David Brown',
-        address: '654 Gbagada, Lagos',
-        phone: '+234 805 678 9012',
-        amount: 12000,
-        status: 'Outstanding',
-        dueDate: '2024-01-20',
-        createdAt: '2024-01-03'
-    }
-];
 
-// Demo Data for Payments
-const demoPayments = [
-    {
-        id: 1,
-        transactionId: 'TXN-001',
-        receiptId: 'RCP-001',
-        customerName: 'Jane Smith',
-        address: '456 Ikoyi, Lagos',
-        amount: 25000,
-        date: '2024-01-08',
-        createdAt: '2024-01-08'
-    },
-    {
-        id: 2,
-        transactionId: 'TXN-002',
-        receiptId: 'RCP-002',
-        customerName: 'Sarah Wilson',
-        address: '321 Surulere, Lagos',
-        amount: 32000,
-        date: '2024-01-03',
-        createdAt: '2024-01-03'
-    },
-    {
-        id: 3,
-        transactionId: 'TXN-003',
-        receiptId: 'RCP-003',
-        customerName: 'Robert Davis',
-        address: '987 Yaba, Lagos',
-        amount: 15000,
-        date: '2024-01-10',
-        createdAt: '2024-01-10'
-    },
-    {
-        id: 4,
-        transactionId: 'TXN-004',
-        receiptId: 'RCP-004',
-        customerName: 'Lisa Anderson',
-        address: '654 Ikeja, Lagos',
-        amount: 28000,
-        date: '2024-01-12',
-        createdAt: '2024-01-12'
-    }
-];
 
 
 // Date formatting utility function
@@ -261,57 +160,31 @@ const BillsAndReceipts = () => {
                 dueDate: newDueDate
             };
 
-            if (import.meta.env.DEV) {
-                // Simulate API call in development
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-                if (isEditMode) {
-                    // Update existing bill
-                    const updatedBill = {
-                        ...editingBill,
-                        ...billData
-                    };
-                    setBills(prevBills => prevBills.map(bill =>
-                        bill.id === editingBill.id ? updatedBill : bill
-                    ));
+            if (isEditMode) {
+                // Update existing bill
+                const { data } = await api.put(`/bills/${editingBill.id}`, billData);
+                if (data.success) {
+                    // Refresh bills list
+                    const billsData = await api.get('/bills');
+                    if (billsData.data.success) {
+                        setBills(billsData.data.data);
+                    }
                     showNotification('Bill updated successfully!', 'success');
                 } else {
-                    // Add new bill
-                    const newBill = {
-                        id: bills.length + 1,
-                        ...billData,
-                        createdAt: new Date().toISOString().split('T')[0]
-                    };
-                    setBills([...bills, newBill]);
-                    showNotification('Bill created successfully!', 'success');
+                    showNotification(data.message || 'Failed to update bill.', 'error');
                 }
             } else {
-                if (isEditMode) {
-                    // Update existing bill
-                    const { data } = await api.put(`/bills/${editingBill.id}`, billData);
-                    if (data.success) {
-                        // Refresh bills list
-                        const billsData = await api.get('/bills');
-                        if (billsData.data.success) {
-                            setBills(billsData.data.data);
-                        }
-                        showNotification('Bill updated successfully!', 'success');
-                    } else {
-                        showNotification(data.message || 'Failed to update bill.', 'error');
+                // Create new bill
+                const { data } = await api.post('/bills', billData);
+                if (data.success) {
+                    // Refresh bills list
+                    const billsData = await api.get('/bills');
+                    if (billsData.data.success) {
+                        setBills(billsData.data.data);
                     }
+                    showNotification('Bill created successfully!', 'success');
                 } else {
-                    // Create new bill
-                    const { data } = await api.post('/bills', billData);
-                    if (data.success) {
-                        // Refresh bills list
-                        const billsData = await api.get('/bills');
-                        if (billsData.data.success) {
-                            setBills(billsData.data.data);
-                        }
-                        showNotification('Bill created successfully!', 'success');
-                    } else {
-                        showNotification(data.message || 'Failed to create bill.', 'error');
-                    }
+                    showNotification(data.message || 'Failed to create bill.', 'error');
                 }
             }
         } catch (error) {
@@ -348,57 +221,31 @@ const BillsAndReceipts = () => {
                 paidAt: newPaymentStatus === 'Completed' ? new Date().toISOString().split('T')[0] : null
             };
 
-            if (import.meta.env.DEV) {
-                // Simulate API call in development
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-                if (isEditPaymentMode) {
-                    // Update existing payment
-                    const updatedPayment = {
-                        ...editingPayment,
-                        ...paymentData
-                    };
-                    setPayments(prevPayments => prevPayments.map(payment =>
-                        payment.id === editingPayment.id ? updatedPayment : payment
-                    ));
+            if (isEditPaymentMode) {
+                // Update existing payment
+                const { data } = await api.put(`/payments/${editingPayment.id}`, paymentData);
+                if (data.success) {
+                    // Refresh payments list
+                    const paymentsData = await api.get('/payments');
+                    if (paymentsData.data.success) {
+                        setPayments(paymentsData.data.data);
+                    }
                     showNotification('Payment updated successfully!', 'success');
                 } else {
-                    // Add new payment
-                    const newPayment = {
-                        id: payments.length + 1,
-                        ...paymentData,
-                        createdAt: new Date().toISOString().split('T')[0]
-                    };
-                    setPayments([...payments, newPayment]);
-                    showNotification('Payment created successfully!', 'success');
+                    showNotification(data.message || 'Failed to update payment.', 'error');
                 }
             } else {
-                if (isEditPaymentMode) {
-                    // Update existing payment
-                    const { data } = await api.put(`/payments/${editingPayment.id}`, paymentData);
-            if (data.success) {
-                        // Refresh payments list
-                        const paymentsData = await api.get('/payments');
-                        if (paymentsData.data.success) {
-                            setPayments(paymentsData.data.data);
-                        }
-                        showNotification('Payment updated successfully!', 'success');
-                    } else {
-                        showNotification(data.message || 'Failed to update payment.', 'error');
+                // Create new payment
+                const { data } = await api.post('/payments', paymentData);
+                if (data.success) {
+                    // Refresh payments list
+                    const paymentsData = await api.get('/payments');
+                    if (paymentsData.data.success) {
+                        setPayments(paymentsData.data.data);
                     }
-            } else {
-                    // Create new payment
-                    const { data } = await api.post('/payments', paymentData);
-                    if (data.success) {
-                        // Refresh payments list
-                        const paymentsData = await api.get('/payments');
-                        if (paymentsData.data.success) {
-                            setPayments(paymentsData.data.data);
-                        }
-                        showNotification('Payment created successfully!', 'success');
-                    } else {
-                        showNotification(data.message || 'Failed to create payment.', 'error');
-                    }
+                    showNotification('Payment created successfully!', 'success');
+                } else {
+                    showNotification(data.message || 'Failed to create payment.', 'error');
                 }
             }
         } catch (error) {
@@ -420,27 +267,18 @@ const BillsAndReceipts = () => {
         setIsDeleting(true);
 
         try {
-            if (import.meta.env.DEV) {
-                // Simulate API call in development
-                await new Promise(resolve => setTimeout(resolve, 1500));
+            // Make actual API call
+            const { data } = await api.delete(`/bills/${currentBillId}`);
 
-                // Remove bill from local state
-                setBills(prevBills => prevBills.filter(bill => bill.id !== currentBillId));
+            if (data.success) {
+                // Refresh bills list
+                const billsData = await api.get('/bills');
+                if (billsData.data.success) {
+                    setBills(billsData.data.data);
+                }
                 showNotification('Bill deleted successfully!', 'success');
-                } else {
-                // Make actual API call
-                const { data } = await api.delete(`/bills/${currentBillId}`);
-
-                if (data.success) {
-                    // Refresh bills list
-                    const billsData = await api.get('/bills');
-                    if (billsData.data.success) {
-                        setBills(billsData.data.data);
-                    }
-                    showNotification('Bill deleted successfully!', 'success');
             } else {
-                    showNotification(data.message || 'Failed to delete bill.', 'error');
-            }
+                showNotification(data.message || 'Failed to delete bill.', 'error');
             }
         } catch (error) {
             console.error('Error deleting bill:', error);
@@ -461,27 +299,18 @@ const BillsAndReceipts = () => {
         setIsDeleting(true);
 
         try {
-            if (import.meta.env.DEV) {
-                // Simulate API call in development
-                await new Promise(resolve => setTimeout(resolve, 1500));
+            // Make actual API call
+            const { data } = await api.delete(`/payments/${currentPaymentId}`);
 
-                // Remove payment from local state
-                setPayments(prevPayments => prevPayments.filter(payment => payment.id !== currentPaymentId));
+            if (data.success) {
+                // Refresh payments list
+                const paymentsData = await api.get('/payments');
+                if (paymentsData.data.success) {
+                    setPayments(paymentsData.data.data);
+                }
                 showNotification('Payment deleted successfully!', 'success');
             } else {
-                // Make actual API call
-                const { data } = await api.delete(`/payments/${currentPaymentId}`);
-
-                if (data.success) {
-                    // Refresh payments list
-                    const paymentsData = await api.get('/payments');
-                    if (paymentsData.data.success) {
-                        setPayments(paymentsData.data.data);
-                    }
-                    showNotification('Payment deleted successfully!', 'success');
-                } else {
-                    showNotification(data.message || 'Failed to delete payment.', 'error');
-                }
+                showNotification(data.message || 'Failed to delete payment.', 'error');
             }
         } catch (error) {
             console.error('Error deleting payment:', error);
@@ -556,17 +385,13 @@ const BillsAndReceipts = () => {
                 setPayments(rawPayments);
             } catch (paymentsError) {
                 console.error('Error fetching payments:', paymentsError);
-                setPayments(demoPayments);
+                setPayments([]);
             }
 
         } catch (error) {
             console.error('Error fetching bills:', error);
-            // Fallback to demo data
-            if (import.meta.env.DEV) {
-                await new Promise(resolve => setTimeout(resolve, 2000));
-            }
-            setBills(demoBills);
-            setPayments(demoPayments);
+            setBills([]);
+            setPayments([]);
         } finally {
             setIsLoading(false);
         }
@@ -984,9 +809,6 @@ const BillsAndReceipts = () => {
         setIsVerifying(true);
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
             // Find the payment by receipt ID
             const payment = payments.find(p => p.receiptId === selectedReceiptId);
             

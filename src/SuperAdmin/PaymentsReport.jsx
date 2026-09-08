@@ -24,39 +24,6 @@ const defaultReportData = {
     transactions: [],
 };
 
-// Dummy data for simulation
-const dummyReportData = {
-    title: 'Q2 Payment Report',
-    generatedDate: '2025-07-15T14:30:00Z',
-    dateRange: 'Apr 1 - Jun 30',
-    totalPaymentMade: 2500000,
-    smartBinPurchaseTotal: 1000000,
-    wasteDisposalTotal: 750000,
-    walletFundingTotal: 500000,
-    subscriptionFundingTotal: 250000,
-    smartBinPurchaseProgress: 40,
-    wasteDisposalProgress: 30,
-    walletFundingProgress: 20,
-    subscriptionFundingProgress: 10,
-    transactions: [
-        { sn: 1, id: 'TXN001', receiptId: 'RCPT001', service: 'Smart Bin Purchase', amount: 50000, paymentMethod: 'Credit Card', date: '2025-04-15' },
-        { sn: 2, id: 'TXN002', receiptId: 'RCPT002', service: 'Waste Disposal', amount: 25000, paymentMethod: 'Bank Transfer', date: '2025-04-18' },
-        { sn: 3, id: 'TXN003', receiptId: 'RCPT003', service: 'Wallet Top-Up', amount: 10000, paymentMethod: 'PayPal', date: '2025-04-20' },
-        { sn: 4, id: 'TXN004', receiptId: 'RCPT004', service: 'Subscription', amount: 15000, paymentMethod: 'Credit Card', date: '2025-04-22' },
-        { sn: 5, id: 'TXN005', receiptId: 'RCPT005', service: 'Smart Bin Purchase', amount: 75000, paymentMethod: 'Bank Transfer', date: '2025-05-01' },
-        { sn: 6, id: 'TXN006', receiptId: 'RCPT006', service: 'Waste Disposal', amount: 30000, paymentMethod: 'Credit Card', date: '2025-05-05' },
-        { sn: 7, id: 'TXN007', receiptId: 'RCPT007', service: 'Wallet Top-Up', amount: 20000, paymentMethod: 'PayPal', date: '2025-05-10' },
-        { sn: 8, id: 'TXN008', receiptId: 'RCPT008', service: 'Subscription', amount: 15000, paymentMethod: 'Bank Transfer', date: '2025-05-15' },
-        { sn: 9, id: 'TXN009', receiptId: 'RCPT009', service: 'Smart Bin Purchase', amount: 100000, paymentMethod: 'Credit Card', date: '2025-05-20' },
-        { sn: 10, id: 'TXN010', receiptId: 'RCPT010', service: 'Waste Disposal', amount: 35000, paymentMethod: 'Credit Card', date: '2025-05-25' },
-        { sn: 11, id: 'TXN011', receiptId: 'RCPT011', service: 'Wallet Top-Up', amount: 25000, paymentMethod: 'Bank Transfer', date: '2025-06-01' },
-        { sn: 12, id: 'TXN012', receiptId: 'RCPT012', service: 'Subscription', amount: 15000, paymentMethod: 'PayPal', date: '2025-06-05' },
-        { sn: 13, id: 'TXN013', receiptId: 'RCPT013', service: 'Smart Bin Purchase', amount: 125000, paymentMethod: 'Credit Card', date: '2025-06-10' },
-        { sn: 14, id: 'TXN014', receiptId: 'RCPT014', service: 'Waste Disposal', amount: 40000, paymentMethod: 'Bank Transfer', date: '2025-06-15' },
-        { sn: 15, id: 'TXN015', receiptId: 'RCPT015', service: 'Wallet Top-Up', amount: 30000, paymentMethod: 'Credit Card', date: '2025-06-20' },
-    ],
-};
-
 
 
 // --- Helper Functions ---
@@ -132,10 +99,6 @@ const PaymentReportPage = () => {
             setIsLoading(true);
             setError(null);
             setSuccess(null);
-
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
             // Original API call logic
             const paymentData = JSON.parse(localStorage.getItem('paymentHistory'));
             if (!paymentData) {

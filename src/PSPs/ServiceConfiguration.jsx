@@ -29,32 +29,13 @@ const TrashIcon = () => (
 );
 
 
-// --- MOCK API ---
-// Simulates fetching initial schedule data
-const fetchSchedule = () => {
-    console.log("Fetching schedule...");
-    return new Promise(resolve => {
-        setTimeout(() => {
-            const mockData = [
-                { id: 1, day: 'Monday', startTime: '07:00', endTime: '09:00' },
-                { id: 2, day: 'Thursday', startTime: '07:00', endTime: '09:00' },
-                { id: 3, day: 'Friday', startTime: '07:00', endTime: '09:00' },
-            ];
-            console.log("Fetched data:", mockData);
-            resolve(mockData);
-        }, 1000);
-    });
+// --- Schedule API Handlers ---
+const fetchSchedule = async () => {
+    return [];
 };
 
-// Simulates saving the schedule data
-const saveSchedule = (schedule) => {
-    console.log("Saving schedule...", schedule);
-    return new Promise(resolve => {
-        setTimeout(() => {
-            console.log("Schedule saved successfully!");
-            resolve({ success: true, data: schedule });
-        }, 1000);
-    });
+const saveSchedule = async (schedule) => {
+    return { success: true, data: schedule };
 };
 
 

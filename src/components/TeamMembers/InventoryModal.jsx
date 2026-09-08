@@ -21,29 +21,19 @@ const CalendarDaysIcon = () => (
     </svg>
 );
 
-// --- MOCK API ---
-// This function simulates fetching detailed data for a pending order.
-const fetchPendingOrderDetails = (orderId) => {
-    console.log(`Fetching details for pending order ${orderId}...`);
-    const mockDetails = {
+const fetchPendingOrderDetails = async (orderId) => {
+    return {
         id: orderId,
         status: 'Pending',
-        orderDate: new Date(2023, 8, 8, 14, 33),
-        price: '₦10,000.00',
-        customerName: 'King Kalistus',
-        phone: '+234 8123456789',
-        email: 'king.k@example.com',
-        address: '12 Bode Thomas Avenue, Sasha Junction, Surulere, Lagos',
-        lga: 'Surulere',
-        quantity: '12kg Smart bin x 1',
+        orderDate: new Date(),
+        price: '₦0.00',
+        customerName: '',
+        phone: '',
+        email: '',
+        address: '',
+        lga: '',
+        quantity: '',
     };
-    // Simulate network delay
-    return new Promise(resolve => {
-        setTimeout(() => {
-            console.log("Data fetched.");
-            resolve(mockDetails);
-        }, 1000); // 1 second delay
-    });
 };
 
 

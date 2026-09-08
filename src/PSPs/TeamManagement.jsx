@@ -19,9 +19,7 @@ import {
 } from "../components/icons";
 import SkeletonLoader from "../components/SkeletonLoader";
 
-// Demo Data (as per image)
 
-// Demo Data for Roles and Privileges
 
 // Main Component
 const TeamManagement = () => {
@@ -162,70 +160,34 @@ const TeamManagement = () => {
         })),
       };
 
-      if (import.meta.env.DEV) {
-        // Simulate API call in development
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // ... inside handleAddMemberSubmit
-        if (isEditMode) {
-          // UPDATE MEMBER
-          const memberId = editingMember._id || editingMember.id;
-
-          const { data } = await api.put(
-            `/lawma/psps/team/members/${memberId}`,
-            {
-              pspId: pspId,
-              name: newName,
-              email: newEmail,
-              phone_number: newPhone,
-              role: newRole.toLowerCase().trim(),
-              status: newStatus.toLowerCase().trim(),
-            },
-          );
-          // ...
+      if (isEditRoleMode) {
+        // Update existing role
+        const { data } = await api.put(
+          `/psps/roles/${editingRole.id}`,
+          roleData,
+        );
+        if (data.success) {
+          // Refresh roles list
+          const rolesData = await api.get("/psps/roles");
+          if (rolesData.data.success) {
+            setRoles(rolesData.data.data);
+          }
           showNotification("Role updated successfully!", "success");
         } else {
-          // Add new role
-          const newRole = {
-            id: roles.length + 1,
-            role: newRoleName.trim(),
-            permission: validModules.map((m) => m.name).join(", "),
-            members: 0,
-            dateCreated: new Date().toISOString().split("T")[0],
-          };
-          setRoles([...roles, newRole]);
-          showNotification("Role created successfully!", "success");
+          showNotification(data.message || "Failed to update role.", "error");
         }
       } else {
-        if (isEditRoleMode) {
-          // Update existing role
-          const { data } = await api.put(
-            `/psps/roles/${editingRole.id}`,
-            roleData,
-          );
-          if (data.success) {
-            // Refresh roles list
-            const rolesData = await api.get("/psps/roles");
-            if (rolesData.data.success) {
-              setRoles(rolesData.data.data);
-            }
-            showNotification("Role updated successfully!", "success");
-          } else {
-            showNotification(data.message || "Failed to update role.", "error");
+        // Create new role
+        const { data } = await api.post("/psps/roles", roleData);
+        if (data.success) {
+          // Refresh roles list
+          const rolesData = await api.get("/psps/roles");
+          if (rolesData.data.success) {
+            setRoles(rolesData.data.data);
           }
+          showNotification("Role created successfully!", "success");
         } else {
-          // Create new role
-          const { data } = await api.post("/psps/roles", roleData);
-          if (data.success) {
-            // Refresh roles list
-            const rolesData = await api.get("/psps/roles");
-            if (rolesData.data.success) {
-              setRoles(rolesData.data.data);
-            }
-            showNotification("Role created successfully!", "success");
-          } else {
-            showNotification(data.message || "Failed to create role.", "error");
-          }
+          showNotification(data.message || "Failed to create role.", "error");
         }
       }
     } catch (error) {
@@ -353,7 +315,7 @@ const TeamManagement = () => {
     if (roleToEdit) {
       setEditingRole(roleToEdit);
       setNewRoleName(roleToEdit.role);
-      // For demo purposes, we'll create a default module structure
+      // Default module structure
       // In a real app, you'd fetch the role's modules from the API
       setModules([
         { name: roleToEdit.permission, privileges: ["View", "Edit"] },
@@ -523,30 +485,18 @@ const TeamManagement = () => {
     setIsRemovingRole(true);
 
     try {
-      if (import.meta.env.DEV) {
-        // Simulate API call in development
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Make actual API call
+      const { data } = await api.delete(`/psps/roles/${currentRoleId}`);
 
-        // Remove role from local state
-        setRoles((prevRoles) =>
-          prevRoles.filter((role) => role.id !== currentRoleId),
-        );
-
+      if (data.success) {
+        // Refresh roles list
+        const rolesData = await api.get("/psps/roles");
+        if (rolesData.data.success) {
+          setRoles(rolesData.data.data);
+        }
         showNotification("Role removed successfully!", "success");
       } else {
-        // Make actual API call
-        const { data } = await api.delete(`/psps/roles/${currentRoleId}`);
-
-        if (data.success) {
-          // Refresh roles list
-          const rolesData = await api.get("/psps/roles");
-          if (rolesData.data.success) {
-            setRoles(rolesData.data.data);
-          }
-          showNotification("Role removed successfully!", "success");
-        } else {
-          showNotification(data.message || "Failed to remove role.", "error");
-        }
+        showNotification(data.message || "Failed to remove role.", "error");
       }
     } catch (error) {
       console.error("Error removing role:", error);
