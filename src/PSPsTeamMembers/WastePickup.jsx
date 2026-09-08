@@ -3,133 +3,7 @@ import Sidebar from "../components/PSPsTeamMembers/Sidebar";
 import Topbar from "../components/PSPsTeamMembers/Topbar";
 import { LoadingSpinnerIcon, SearchIcon } from "../components/icons";
 
-// Dummy row shape:
-// { id, name, address, phone, wasteId, fillLevel }
-const demoAssigned = [
-  {
-    id: 1,
-    name: "Adebolade Aina",
-    email: "adebolade.aina@example.com",
-    address: "12, Awolowo Road, Ikoyi, Lagos",
-    lga: "Eti-Osa",
-    lcda: "Ikoyi-Obalende",
-    phone: "08029389102",
-    wasteId: "#OD123456789",
-    fillLevel: "97%",
-    note: "Bin is almost full. Please come today if possible.",
-  },
-  {
-    id: 2,
-    name: "Bolanle Toju",
-    email: "bolanle.toju@example.com",
-    address: "45, Ogunlana Drive, Surulere, Lagos",
-    lga: "Surulere",
-    lcda: "Coker-Aguda",
-    phone: "08032784726",
-    wasteId: "#OD123456790",
-    fillLevel: "54%",
-    note: "Gate is locked; call when you arrive.",
-  },
-  {
-    id: 3,
-    name: "Faridat Deola",
-    email: "faridat.deola@example.com",
-    address: "8, Akin Adesola Street, Victoria Island, Lagos",
-    lga: "Eti-Osa",
-    lcda: "Victoria Island",
-    phone: "08142904836",
-    wasteId: "#OD123456791",
-    fillLevel: "71%",
-    note: "Pickup preferred before 12pm.",
-  },
-  {
-    id: 4,
-    name: "Martins Madueke",
-    email: "martins.madueke@example.com",
-    address: "10, Allen Avenue, Ikeja, Lagos",
-    lga: "Ikeja",
-    lcda: "Onigbongbo",
-    phone: "07023780192",
-    wasteId: "#OD123456792",
-    fillLevel: "33%",
-    note: "Bin is behind the house (second gate).",
-  },
-  {
-    id: 5,
-    name: "Fisayo Mabel",
-    email: "fisayo.mabel@example.com",
-    address: "4, Bode Thomas Street, Surulere, Lagos",
-    lga: "Surulere",
-    lcda: "Itire-Ikate",
-    phone: "09011892739",
-    wasteId: "#OD123456793",
-    fillLevel: "88%",
-    note: "Please avoid blocking the driveway.",
-  },
-];
 
-const demoCompleted = [
-  {
-    id: 6,
-    name: "Fidelis James",
-    email: "fidelis.james@example.com",
-    address: "1, Admiralty Way, Lekki Phase 1, Lagos",
-    lga: "Eti-Osa",
-    lcda: "Lekki",
-    phone: "07038902948",
-    wasteId: "#OD123456794",
-    fillLevel: "62%",
-    note: "Pickup completed. Thank you.",
-  },
-  {
-    id: 7,
-    name: "Grace Okonkwo",
-    email: "grace.okonkwo@example.com",
-    address: "22, Ozumba Mbadiwe, Victoria Island, Lagos",
-    lga: "Eti-Osa",
-    lcda: "Victoria Island",
-    phone: "08123456789",
-    wasteId: "#OD123456795",
-    fillLevel: "40%",
-    note: "Waste collected successfully.",
-  },
-  {
-    id: 8,
-    name: "Chinedu Okafor",
-    email: "chinedu.okafor@example.com",
-    address: "15, Herbert Macaulay Way, Yaba, Lagos",
-    lga: "Lagos Mainland",
-    lcda: "Yaba",
-    phone: "08098765432",
-    wasteId: "#OD123456796",
-    fillLevel: "95%",
-    note: "Bin was overflowing. Extra bag collected.",
-  },
-  {
-    id: 9,
-    name: "Amina Hassan",
-    email: "amina.hassan@example.com",
-    address: "9, Adeniran Ogunsanya, Surulere, Lagos",
-    lga: "Surulere",
-    lcda: "Surulere",
-    phone: "07012345678",
-    wasteId: "#OD123456797",
-    fillLevel: "28%",
-    note: "No issues during pickup.",
-  },
-  {
-    id: 10,
-    name: "Emmanuel Adebayo",
-    email: "emmanuel.adebayo@example.com",
-    address: "3, Adeola Odeku, Victoria Island, Lagos",
-    lga: "Eti-Osa",
-    lcda: "Victoria Island",
-    phone: "09087654321",
-    wasteId: "#OD123456798",
-    fillLevel: "79%",
-    note: "Pickup done. Customer requested weekly schedule.",
-  },
-];
 
 function parseFillLevel(fillLevel) {
   const n = Number(
@@ -588,8 +462,8 @@ function WasteCards({ rows, onItemClick }) {
 }
 
 export default function WastePickup() {
-  const [assignedRows, setAssignedRows] = useState(demoAssigned);
-  const [completedRows, setCompletedRows] = useState(demoCompleted);
+  const [assignedRows, setAssignedRows] = useState([]);
+  const [completedRows, setCompletedRows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [fillFilter, setFillFilter] = useState("all"); // all | high | medium | low
   const [isFilterOpen, setIsFilterOpen] = useState(false);

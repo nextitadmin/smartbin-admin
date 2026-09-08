@@ -2,41 +2,42 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/SuperAdmin/Sidebar";
 import Topbar from "../components/SuperAdmin/Topbar";
+import api from "../api/apiConfig";
 
 // --- Helper Functions ---
 
 // Helper function to convert number to words (Nigerian Naira)
 const numberToWordsNaira = (num) => {
-    if (num === null || num === undefined) return '';
-    if (num === 0) return 'Zero Naira Only';
+  if (num === null || num === undefined) return '';
+  if (num === 0) return 'Zero Naira Only';
 
-    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-    const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-    const thousands = ['', 'Thousand', 'Million', 'Billion'];
+  const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+  const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  const thousands = ['', 'Thousand', 'Million', 'Billion'];
 
-    let word = '';
+  let word = '';
 
-    const toWords = (n) => {
-        if (n === 0) return '';
-        if (n < 10) return ones[n] + ' ';
-        if (n < 20) return teens[n - 10] + ' ';
-        if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '') + ' ';
-        if (n < 1000) return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + toWords(n % 100, '') : '') + ' ';
-        return '';
-    };
+  const toWords = (n) => {
+    if (n === 0) return '';
+    if (n < 10) return ones[n] + ' ';
+    if (n < 20) return teens[n - 10] + ' ';
+    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '') + ' ';
+    if (n < 1000) return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + toWords(n % 100, '') : '') + ' ';
+    return '';
+  };
 
-    let i = 0;
-    let number = num;
-    while (number > 0) {
-        if (number % 1000 !== 0) {
-            word = toWords(number % 1000, '') + thousands[i] + (i > 0 ? ' ' : '') + word;
-        }
-        number = Math.floor(number / 1000);
-        i++;
+  let i = 0;
+  let number = num;
+  while (number > 0) {
+    if (number % 1000 !== 0) {
+      word = toWords(number % 1000, '') + thousands[i] + (i > 0 ? ' ' : '') + word;
     }
+    number = Math.floor(number / 1000);
+    i++;
+  }
 
-    return word.trim() + ' Naira Only';
+  return word.trim() + ' Naira Only';
 };
 
 // --- Raw SVG Icons (Hero Icons) ---
@@ -115,8 +116,6 @@ const MonthTimeSelect = () => {
   );
 };
 
-// --- Mock Data and API Simulation (Unchanged) ---
-
 const pendingBillsColumns = [
   { key: "sn", label: "S/N", sortable: true },
   { key: "billId", label: "Bill ID", sortable: true },
@@ -139,72 +138,19 @@ const paymentsColumns = [
   { key: "action", label: "Action", sortable: false },
 ];
 
-// Generate mock data for Pending Bills
-const MOCK_PENDING_BILLS = Array.from({ length: 15 }, (_, i) => ({
-  sn: i + 1,
-  billId: `#OD1258904${i}`,
-  name: "Olabankole Kolawole",
-  payId: `N-1465${6 + i}`,
-  service: "Waste Bin Disposal",
-  amount: (3500 + i * 1000).toFixed(2),
-  status: "Pending",
-  // Based on design, only one row has 'Pay now'
-  action: i === 4 ? "Pay now" : "View bill",
-  // Add multiple payment items for bills
-  paymentItems: [
-    { 
-      description: "Waste Bin Disposal Service", 
-      amount: 3500 + i * 1000 
-    },
-    // { 
-    //     description: 'Environmental compliance fee', 
-    //     amount: 1500 + i * 200 
-    // },
-    // { 
-    //     description: 'Service maintenance fee', 
-    //     amount: 800 + i * 150 
-    // }
-  ],
-}));
+// --- Data Fetching ---
 
-// Generate mock data for Payments
-const MOCK_PAYMENTS = Array.from({ length: 15 }, (_, i) => ({
-  sn: i + 1,
-  paymentId: `PAY-${String(i + 1).padStart(3, '0')}`, // Match Receipt component format
-  revenueSource: i % 3 === 0 ? "Waste Collection" : "Smart Bin purchase",
-  amount: (20000 + i * 50).toFixed(2),
-  date: `26-06-23`,
-  paymentMethod: i % 2 === 0 ? "Alat by Wema" : "In-app wallet",
-  status: "Successful",
-  action: "View receipt",
-  // Additional fields needed for Receipt component
-  recipientName: `Customer ${i + 1}`,
-  transactionId: `TXN-${String(i + 1).padStart(3, '0')}-2025`,
-  transactionRef: `REF-${String(i + 1).padStart(3, '0')}-2025`,
-  phoneNumber: `+234 80${i + 1} ${String(Math.floor(Math.random() * 1000)).padStart(3, '0')} ${String(Math.floor(Math.random() * 10000)).padStart(3, '0')}`,
-  transactionDate: new Date().toLocaleString(),
-  address: `${100 + i} Main Street, Lagos`,
-  paymentItems: [
-    { 
-      description: i % 3 === 0 ? "Waste Collection Service" : "Smart Bin purchase", 
-      amount: 20000 + i * 50 
-    }
-  ],
-  currencySymbol: "₦",
-  amountInWords: numberToWordsNaira(20000 + i * 50),
-}));
-
-// Function to simulate API call returning a promise
-const fetchData = (type) =>
-  new Promise((resolve) => {
-    setTimeout(() => {
-      if (type === "bills") {
-        resolve(MOCK_PENDING_BILLS);
-      } else {
-        resolve(MOCK_PAYMENTS);
-      }
-    }, 500); // Simulate network delay
-  });
+const fetchData = async (type) => {
+  try {
+    const endpoint = type === "bills" ? "/lawma/superadmins/reconciliation/bills" : "/lawma/superadmins/reconciliation/payments";
+    const response = await api.get(endpoint);
+    const result = response?.data?.data ?? response?.data ?? [];
+    return Array.isArray(result) ? result : [];
+  } catch (error) {
+    console.error(`Error fetching reconciliation ${type}:`, error);
+    return [];
+  }
+};
 
 // --- Table Component (Handles Sorting and Rendering) ---
 
@@ -244,7 +190,7 @@ const ReconciliationTable = ({ columns, tabType }) => {
   // Handle action clicks
   const handleActionClick = (action, row) => {
     console.log("Action clicked:", action, "Row data:", row);
-    
+
     try {
       if (action === "View receipt") {
         // Store payment ID in localStorage for the receipt component
@@ -263,19 +209,19 @@ const ReconciliationTable = ({ columns, tabType }) => {
           transactionId: row.billId,
           paymentId: row.billId,
           transactionRef: row.billId,
-          phoneNumber: `+234 80${Math.floor(Math.random() * 1000000000)}`, // Generate random phone
+          phoneNumber: row.phoneNumber || row.phone || "N/A",
           transactionDate: new Date().toLocaleString(),
           paymentItems: row.paymentItems || [
-            { 
-              description: row.service, 
-              amount: parseFloat(row.amount) 
+            {
+              description: row.service,
+              amount: parseFloat(row.amount)
             }
           ],
           currencySymbol: "₦",
-          amountInWords: row.paymentItems ? 
+          amountInWords: row.paymentItems ?
             numberToWordsNaira(row.paymentItems.reduce((sum, item) => sum + item.amount, 0)) :
             numberToWordsNaira(parseFloat(row.amount)),
-          address: "Lagos, Nigeria", // Default address
+          address: row.address || "N/A",
           paymentMethod: "Pending Payment",
           status: row.status
         };
@@ -284,9 +230,9 @@ const ReconciliationTable = ({ columns, tabType }) => {
         console.log("Navigating to bills receipt with data:", billData);
         // Navigate to BillsReceipt page
         navigate("/bills-receipt");
-      } else if (action === "Pay now") {
+      } else if (action === "Make Payment") {
         // Handle pay now action if needed
-        console.log("Pay now clicked for:", row);
+        console.log("Make Payment clicked for:", row);
       }
     } catch (error) {
       console.error("Error in handleActionClick:", error);
@@ -342,9 +288,9 @@ const ReconciliationTable = ({ columns, tabType }) => {
     return "text-zinc-600 bg-zinc-100 border-zinc-300"; // Fallback
   };
 
-  // Updated styles to match design colors (Red for Pay now, Green for others)
+  // Updated styles to match design colors (Red for Make Payment, Green for others)
   const getActionStyle = (action) => {
-    if (action === "Pay now") return "text-red-500 font-medium";
+    if (action === "Make Payment") return "text-red-500 font-medium";
     return "text-green-500 font-medium";
   };
 
@@ -424,7 +370,7 @@ const ReconciliationTable = ({ columns, tabType }) => {
           <TimeFilterButton label="Today" value="Today" />
 
           {/* Month selection component */}
-          
+
           <MonthFilterButton cla label="This Month" value="This Month" />
 
           <TimeFilterButton
@@ -454,11 +400,10 @@ const ReconciliationTable = ({ columns, tabType }) => {
                     key={col.key}
                     onClick={() => col.sortable && handleSort(col.key)}
                     scope="col"
-                    className={`px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 ${
-                      col.sortable
+                    className={`px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600 ${col.sortable
                         ? "cursor-pointer hover:bg-zinc-100 transition duration-150"
                         : ""
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center">
                       {col.label}
@@ -546,22 +491,25 @@ const ReconciliationTable = ({ columns, tabType }) => {
 // --- Summary Cards Component ---
 
 const SummaryCards = () => {
-  // Updated mock data values and colors to match the design (Payment made is green)
   const cards = [
-    { title: "Unpaid bills", value: "1,240", isCurrency: false, valueColor: "text-green-700" },
+    { title: "Unpaid bills", value: "0", isCurrency: false, valueColor: "text-green-700" },
     {
       title: "Amount of unpaid bills",
-      value: "30,000",
+      value: "0",
       valueColor: "text-green-700",
       isCurrency: true,
     },
     {
       title: "Payment made",
-      value: "30,000",
+      value: "0",
       valueColor: "text-green-700",
       isCurrency: true,
-      subtitle: "₦850k ₦150k",
-      subtitles:"Bin purchase Waste disposal",
+    },
+    {
+      title: "Total generated",
+      value: "0",
+      valueColor: "text-green-700",
+      isCurrency: true,
     },
   ];
 
@@ -637,11 +585,10 @@ const App = () => {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-2 text-sm font-medium transition duration-200 ${
-                      activeTab === tab
+                    className={`px-4 py-2 text-sm font-medium transition duration-200 ${activeTab === tab
                         ? "text-green-500 border-b-2 border-green-500" // Changed active tab color to green border for contrast
                         : "text-zinc-500 hover:text-zinc-700"
-                    }`}
+                      }`}
                   >
                     {tab}
                   </button>

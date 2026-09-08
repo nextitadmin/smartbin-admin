@@ -3,7 +3,6 @@ import Sidebar from '../components/LawmaAdmin/Sidebar';
 import Topbar from '../components/LawmaAdmin/Topbar';
 import api from '../api/apiConfig';
 import { useNavigate } from 'react-router-dom';
-import demoKyc from '../data/demoKYC';
 import ActorModals from '../components/LawmaAdmin/AdminKYC/ActorModals';
 import SkeletonLoader from '../components/SkeletonLoader';
 import {
@@ -68,34 +67,6 @@ const KYC = () => {
 
 
   const fetchKYCAPI = async (tab = activeTab, page = 1) => {
-    // Check if we're in development mode (supports CRA and Vite)
-    // const isDev =
-    //   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production') ||
-    //   process.env.NODE_ENV === 'development';
-
-    // if (isDev) {
-    //   // Use demo data in development with 2 second delay
-    //   setIsLoading(true);
-    //   await new Promise(resolve => setTimeout(resolve, 2000));
-
-    //   const sourceList = (demoKyc && demoKyc[tab]) ? demoKyc[tab] : [];
-    //   const reportList = sourceList.map((item, index) => ({
-    //     // preserve all original fields for modal/details usage
-    //     ...item,
-    //     id: `${item.email}-${index}`,
-    //     // normalize fields used in table
-    //     applicant: item.applicantName,
-    //     date: item.date,
-    //     email: item.email,
-    //     userType: item.userType
-    //   }));
-
-    //   setReports(reportList);
-    //   setIsLoading(false);
-    //   return;
-    // }
-
-    // Production API call
     try {
       setIsLoading(true);
       const { data } = await api.get(`/lawma/kycs?status=${tab}&page=${page}&limit=${limit}`);
@@ -351,20 +322,6 @@ const KYC = () => {
 
   const handleApproveUser = async (user) => {
     try {
-      // Check if we're in development mode
-      // const isDev =
-      //   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production') ||
-      //   process.env.NODE_ENV === 'development';
-
-      // if (isDev) {
-      //   // Simulate API call in development
-      //   await new Promise(resolve => setTimeout(resolve, 1000));
-      //   showNotification(`User ${user.applicant} has been approved`, 'success');
-      //   setVerificationModal(false);
-      //   fetchKYCAPI(activeTab);
-      //   return;
-      // }
-
       // Production API call - using the correct endpoint
       console.log('Approving user with ID:', user.id);
       console.log('API endpoint:', `/lawma/kycs/${user.id}/approve`);
@@ -387,20 +344,6 @@ const KYC = () => {
 
   const handleRejectUser = async (user) => {
     try {
-      // Check if we're in development mode
-      // const isDev =
-      //   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production') ||
-      //   process.env.NODE_ENV === 'development';
-
-      // if (isDev) {
-      //   // Simulate API call in development
-      //   await new Promise(resolve => setTimeout(resolve, 1000));
-      //   showNotification(`User ${user.applicant} has been rejected`, 'success');
-      //   setVerificationModal(false);
-      //   fetchKYCAPI(activeTab);
-      //   return;
-      // }
-
       // Production API call - using the correct reject endpoint
       console.log('Rejecting user with ID:', user.id);
       console.log('API endpoint:', `/lawma/kycs/${user.id}/reject`);

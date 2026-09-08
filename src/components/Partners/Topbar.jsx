@@ -4,14 +4,37 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MenuIcon } from '../icons';
 import useLogout from '../../hooks/useLogout';
-import useSuperAdminStore from '../../stores/superAdminStore';
+import usePartnersStore from '../../stores/partnersStore';
+import api from '../../api/apiConfig';
 
 export default function Topbar({ onMenuClick }) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const { logout } = useLogout();
-  const resetSuperAdminStore = useSuperAdminStore((state) => state.reset);
-  const profile = useSuperAdminStore((state) => state.profile);
+  const resetPartnersStore = usePartnersStore((state) => state.reset);
+  const profile = usePartnersStore((state) => state.profile);
+  const setProfile = usePartnersStore((state) => state.setProfile);
+  const setUser = usePartnersStore((state) => state.setUser);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await api.get('/lawma-partner/auth/me');
+        if (response.data?.success && response.data?.data) {
+          const userData = response.data.data;
+          if (typeof setUser === 'function') {
+            setUser(userData);
+          } else if (typeof setProfile === 'function') {
+            setProfile(userData);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, [setUser, setProfile]);
 
   const openLogoutModal = () => {
     setIsLogoutModalOpen(true);
@@ -22,15 +45,22 @@ export default function Topbar({ onMenuClick }) {
   };
 
   const handleLogout = () => {
-    // Reset Super Admin specific data
-    resetSuperAdminStore();
-    
+    // Reset Partners specific data
+    resetPartnersStore();
+
     // Perform general logout
     logout();
-    
+
     // Close modal
     closeLogoutModal();
   };
+
+  // Helper to format role (e.g., 'super_admin' -> 'Super Admin', 'smartbin_partner' -> 'SmartBin Partner')
+  const formattedRole = profile?.role
+    ? profile.role
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+    : 'Partners';
 
   return (
     <>
@@ -43,7 +73,7 @@ export default function Topbar({ onMenuClick }) {
             <MenuIcon />
           </button>
           <div className="relative text-zinc-600">
-            <button 
+            <button
               onClick={openLogoutModal}
               className='flex items-center space-x-2 text-red-500 hover:bg-red-50 rounded-md px-3 py-1 transition-colors'
             >
@@ -63,7 +93,7 @@ export default function Topbar({ onMenuClick }) {
               </p>
               <p className="text-xs text-zinc-900 flex items-center gap-1">
                 <span className="w-3 h-3 bg-green-600 border border-white rounded-full"></span>
-                Partners
+                {formattedRole}
               </p>
             </div>
           </div>
@@ -74,14 +104,14 @@ export default function Topbar({ onMenuClick }) {
       {isLogoutModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 py-10 w-full max-w-md m-4">
-            
-            
+
+
             <div className="mb-6 ">
               <p className="text-red-500 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 rotate-90" width={40} height={40}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
                 </svg>
-                
+
               </p>
 
               <p className='text-red-600 flex items-center justify-center mt-2 font-semibold text-lg' >
@@ -90,9 +120,9 @@ export default function Topbar({ onMenuClick }) {
               <p className="text-zinc-600 text-center mt-2">
                 Are you sure you want to logout?
               </p>
-              
+
             </div>
-            
+
             <div className="flex justify-end space-x-3">
               <button
                 onClick={closeLogoutModal}

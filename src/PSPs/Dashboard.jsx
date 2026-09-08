@@ -3,58 +3,9 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import Sidebar from '../components/PSPs/Sidebar';
 import Topbar from '../components/PSPs/Topbar';
 import { TrashIcon, GarbageIcon, WalletIcon } from '../components/icons';
+import api from '../api/apiConfig';
 
-// --- MOCK DATA & API --- //
 
-const mockStats = {
-    wastePickedUp: 200,
-    pendingPickups: 24,
-    amountGenerated: 1000000,
-};
-
-const mockChartData = [
-    { name: 'Jan', disposals: 50 },
-    { name: 'Feb', disposals: 40 },
-    { name: 'Mar', disposals: 60 },
-    { name: 'Apr', disposals: 100 },
-    { name: 'May', disposals: 110 },
-    { name: 'Jun', disposals: 150 },
-    { name: 'Jul', disposals: 180 },
-    { name: 'Aug', disposals: 160 },
-    { name: 'Sep', disposals: 120 },
-    { name: 'Oct', disposals: 80 },
-    { name: 'Nov', disposals: 100 },
-    { name: 'Dec', disposals: 130 },
-];
-
-const mockRecentPayments = [
-    { id: 1, date: '21-01-25', paymentId: '#389839857784578', amount: 300000, status: 'Successful' },
-    { id: 2, date: '22-01-25', paymentId: '#389839857784578', amount: 300000, status: 'Failed' },
-    { id: 3, date: '24-01-25', paymentId: '#389839857784578', amount: 300000, status: 'Successful' },
-    { id: 4, date: '28-01-25', paymentId: '#389839857784578', amount: 300000, status: 'Successful' },
-];
-
-const mockBills = [
-    { id: 1, dueDate: '21-01-25', billId: '#389839857784578', amount: 300000, status: 'Pending' },
-    { id: 2, dueDate: '22-01-25', billId: '#389839857784578', amount: 300000, status: 'Pending' },
-    { id: 3, dueDate: '24-01-25', billId: '#389839857784578', amount: 300000, status: 'Pending' },
-    { id: 4, dueDate: '28-01-25', billId: '#389839857784578', amount: 300000, status: 'Pending' },
-];
-
-const mockPendingRequests = [
-    { id: 1, wasteId: '#OD12589048', customerName: 'Adebolade Aina', phone: '081893083459', address: '12, Awolowo Road, Ikoyi, Lagos', status: 'Pending' },
-    { id: 2, wasteId: '#OD12589048', customerName: 'Falomo Jide', phone: '081893083459', address: '45, Ogunlana Drive, Surulere, Lagos', status: 'Pending' },
-    { id: 3, wasteId: '#OD12589048', customerName: 'Babatunde Shina', phone: '081893083459', address: '4, Bode Thomas Street, Surulere, Lagos', status: 'Pending' },
-    { id: 4, wasteId: '#OD12589048', customerName: 'Fatimo Adetola', phone: '081893083459', address: '8, Akin Adesola Street, Victoria Island, Lagos', status: 'Pending' },
-    { id: 5, wasteId: '#OD12589049', customerName: 'Chioma Okoro', phone: '08012345678', address: '10, Allen Avenue, Ikeja, Lagos', status: 'Pending' },
-];
-
-// Simulating API calls with Promises
-const fetchStats = () => new Promise(resolve => setTimeout(() => resolve(mockStats), 500));
-const fetchChartData = () => new Promise(resolve => setTimeout(() => resolve(mockChartData), 800));
-const fetchRecentPayments = () => new Promise(resolve => setTimeout(() => resolve(mockRecentPayments), 1100));
-const fetchBills = () => new Promise(resolve => setTimeout(() => resolve(mockBills), 1200));
-const fetchPendingRequests = () => new Promise(resolve => setTimeout(() => resolve(mockPendingRequests), 1500));
 
 
 // --- SVG ICONS (Heroicons) --- //
@@ -342,20 +293,31 @@ export default function App() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const [statsData, chartData, paymentsData, billsData, requestsData] = await Promise.all([
-                    fetchStats(),
-                    fetchChartData(),
-                    fetchRecentPayments(),
-                    fetchBills(),
-                    fetchPendingRequests()
-                ]);
-                setStats(statsData);
-                setChartData(chartData);
-                setPayments(paymentsData);
-                setBills(billsData);
-                setRequests(requestsData);
+                const response = await api.get('/psps'); 
+                const payload = response?.data?.data ?? response?.data ?? {};
+
+                const nextStats = payload.stats ?? payload;
+                const nextChartData = payload.chartData ?? payload.chart_data ?? payload.disposals ?? [];
+                const nextPayments = payload.payments ?? payload.recentPayments ?? payload.recent_payments ?? [];
+                const nextBills = payload.bills ?? payload.recentBills ?? payload.recent_bills ?? [];
+                const nextRequests = payload.requests ?? payload.pendingRequests ?? payload.pending_requests ?? [];
+
+                setStats({
+                    wastePickedUp: nextStats?.wastePickedUp ?? nextStats?.waste_picked_up ?? 0,
+                    pendingPickups: nextStats?.pendingPickups ?? nextStats?.pending_pickups ?? 0,
+                    amountGenerated: nextStats?.amountGenerated ?? nextStats?.amount_generated ?? 0,
+                });
+                setChartData(Array.isArray(nextChartData) ? nextChartData : []);
+                setPayments(Array.isArray(nextPayments) ? nextPayments : []);
+                setBills(Array.isArray(nextBills) ? nextBills : []);
+                setRequests(Array.isArray(nextRequests) ? nextRequests : []);
             } catch (error) {
                 console.error("Failed to fetch dashboard data", error);
+                setStats({ wastePickedUp: 0, pendingPickups: 0, amountGenerated: 0 });
+                setChartData([]);
+                setPayments([]);
+                setBills([]);
+                setRequests([]);
             } finally {
                 setLoading({ stats: false, chart: false, payments: false, bills: false, requests: false });
             }

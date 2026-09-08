@@ -91,39 +91,13 @@ export default function SmartbinOverview() {
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching smartbin data:', error);
-                // Fallback to mock data in case of error
-                const mockData = {
-                    totalUsers: 5000000,
-                    smartBinRequests: 3000,
-                    smartBinsDelivered: 400,
-                    userDistribution: [
-                        { name: 'AGL', users: 10000 },
-                        { name: 'KTU', users: 25000 },
-                        { name: 'FST', users: 28000 },
-                        { name: 'APP', users: 19000 },
-                        { name: 'BDG', users: 32000 },
-                        { name: 'EPE', users: 15000 },
-                        { name: 'EKY', users: 58000 },
-                        { name: 'AKD', users: 62000 },
-                        { name: 'FKJ', users: 78000 },
-                        { name: 'KJA', users: 32000 },
-                        { name: 'KRD', users: 14000 },
-                        { name: 'KSF', users: 70000 }, // This is the highlighted bar
-                        { name: 'AAA', users: 45000 },
-                        { name: 'LND', users: 47000 },
-                        { name: 'MUS', users: 30000 },
-                        { name: 'LSD', users: 52000 },
-                        { name: 'SMK', users: 22000 },
-                        { name: 'LSR', users: 42000 },
-                        { name: 'GGE', users: 53000 },
-                    ],
-                    recentlyDelivered: [
-                        { sn: 1, date: '21-01-25', binType: 'Smart', binId: '#OD12589048', address: '23, Association Dr, Dolphin estate...' },
-                        { sn: 2, date: '22-01-25', binType: 'Non smart', binId: '#OD12589048', address: '23, Association Dr, Dolphin estate...' },
-                        { sn: 3, date: '24-01-25', binType: 'Smart', binId: '#OD12589048', address: '23, Association Dr, Dolphin estate...' },
-                    ]
-                };
-                setStats(mockData);
+                setStats({
+                    totalUsers: 0,
+                    smartBinRequests: 0,
+                    smartBinsDelivered: 0,
+                    userDistribution: [],
+                    recentlyDelivered: []
+                });
                 setLoading(false);
             }
         };

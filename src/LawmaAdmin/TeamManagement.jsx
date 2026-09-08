@@ -8,203 +8,7 @@ import api from '../api/apiConfig';
 import { PlusIcon, MagnifyingGlassIcon, XMarkIcon, EllipsisVerticalIcon, CheckCircleIconSolid, ExclamationTriangleIconSolid, LoadingSpinnerIcon, SortIcon, ChevronLeftIcon, ChevronRightIcon } from '../components/icons';
 import SkeletonLoader from '../components/SkeletonLoader';
 
-// Demo Data (as per image)
-const demoTeamMembers = [
-    {
-        id: 1,
-        name: 'Adebimpe Soriyan',
-        email: 'adebimpe.soriyan@lawma.gov.ng',
-        phone: '08029389102',
-        role: 'Super Admin',
-        status: 'Active'
-    },
-    {
-        id: 2,
-        name: 'Bolanle Toju',
-        email: 'bolanle.toju@lawma.gov.ng',
-        phone: '08032784726',
-        role: 'Admin',
-        status: 'Active'
-    },
-    {
-        id: 3,
-        name: 'Faridat Deola',
-        email: 'faridat.deola@lawma.gov.ng',
-        phone: '08142904836',
-        role: 'Manager',
-        status: 'Deactivated'
-    },
-    {
-        id: 4,
-        name: 'Martins Madueke',
-        email: 'martins.madueke@lawma.gov.ng',
-        phone: '07023780192',
-        role: 'Supervisor',
-        status: 'Deactivated'
-    },
-    {
-        id: 5,
-        name: 'Fisayo Mabel',
-        email: 'fisayo.mabel@lawma.gov.ng',
-        phone: '09011892739',
-        role: 'Analyst',
-        status: 'Active'
-    },
-    {
-        id: 6,
-        name: 'Fidelis James',
-        email: 'fidelis.james@lawma.gov.ng',
-        phone: '07038902948',
-        role: 'Coordinator',
-        status: 'Active'
-    },
-    {
-        id: 7,
-        name: 'Grace Okonkwo',
-        email: 'grace.okonkwo@lawma.gov.ng',
-        phone: '08123456789',
-        role: 'Manager',
-        status: 'Active'
-    },
-    {
-        id: 8,
-        name: 'Chinedu Okafor',
-        email: 'chinedu.okafor@lawma.gov.ng',
-        phone: '08098765432',
-        role: 'Supervisor',
-        status: 'Deactivated'
-    },
-    {
-        id: 9,
-        name: 'Amina Hassan',
-        email: 'amina.hassan@lawma.gov.ng',
-        phone: '07012345678',
-        role: 'Analyst',
-        status: 'Active'
-    },
-    {
-        id: 10,
-        name: 'Emmanuel Adebayo',
-        email: 'emmanuel.adebayo@lawma.gov.ng',
-        phone: '09087654321',
-        role: 'Coordinator',
-        status: 'Active'
-    },
-    {
-        id: 11,
-        name: 'Patience Nwosu',
-        email: 'patience.nwosu@lawma.gov.ng',
-        phone: '08134567890',
-        role: 'Admin',
-        status: 'Active'
-    },
-    {
-        id: 12,
-        name: 'Ibrahim Mohammed',
-        email: 'ibrahim.mohammed@lawma.gov.ng',
-        phone: '08076543210',
-        role: 'Supervisor',
-        status: 'Active'
-    },
-    {
-        id: 13,
-        name: 'Blessing Okafor',
-        email: 'blessing.okafor@lawma.gov.ng',
-        phone: '07098765432',
-        role: 'Analyst',
-        status: 'Deactivated'
-    },
-    {
-        id: 14,
-        name: 'Samuel Johnson',
-        email: 'samuel.johnson@lawma.gov.ng',
-        phone: '08123456789',
-        role: 'Manager',
-        status: 'Active'
-    },
-    {
-        id: 15,
-        name: 'Victoria Eze',
-        email: 'victoria.eze@lawma.gov.ng',
-        phone: '08012345678',
-        role: 'Coordinator',
-        status: 'Active'
-    }
-];
 
-// Demo Data for Roles and Privileges
-const demoRoles = [
-    {
-        id: 1,
-        role: 'Super Admin',
-        permission: 'Full System Access',
-        members: 2,
-        dateCreated: '2024-01-10'
-    },
-    {
-        id: 2,
-        role: 'Admin',
-        permission: 'User Management & Reports',
-        members: 3,
-        dateCreated: '2024-01-15'
-    },
-    {
-        id: 3,
-        role: 'Manager',
-        permission: 'Team Management & Analytics',
-        members: 4,
-        dateCreated: '2024-01-20'
-    },
-    {
-        id: 4,
-        role: 'Supervisor',
-        permission: 'Field Operations & Monitoring',
-        members: 6,
-        dateCreated: '2024-02-01'
-    },
-    {
-        id: 5,
-        role: 'Analyst',
-        permission: 'Data Analysis & Reporting',
-        members: 3,
-        dateCreated: '2024-02-05'
-    },
-    {
-        id: 6,
-        role: 'Coordinator',
-        permission: 'Project Coordination',
-        members: 4,
-        dateCreated: '2024-02-10'
-    },
-    {
-        id: 7,
-        role: 'Field Agent',
-        permission: 'Data Collection & Updates',
-        members: 8,
-        dateCreated: '2024-02-15'
-    },
-    {
-        id: 8,
-        role: 'Viewer',
-        permission: 'Read-Only Access',
-        members: 5,
-        dateCreated: '2024-02-20'
-    },
-    {
-        id: 9,
-        role: 'Auditor',
-        permission: 'System Audit & Compliance',
-        members: 2,
-        dateCreated: '2024-02-25'
-    },
-    {
-        id: 10,
-        role: 'Support',
-        permission: 'User Support & Maintenance',
-        members: 3,
-        dateCreated: '2024-03-01'
-    }
-];
 
 // Main Component
 const TeamManagement = () => {
@@ -222,13 +26,13 @@ const TeamManagement = () => {
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     // Modal form fields
     const [newName, setNewName] = useState('');
     const [newEmail, setNewEmail] = useState('');
     const [newPhone, setNewPhone] = useState('');
-    const [newRole, setNewRole] = useState('Admin');
+    const [newRole, setNewRole] = useState('admin');
     const [newStatus, setNewStatus] = useState('Active');
     const [newRoleName, setNewRoleName] = useState('');
 
@@ -250,8 +54,24 @@ const TeamManagement = () => {
     const [isEditRoleMode, setIsEditRoleMode] = useState(false);
     const [editingRole, setEditingRole] = useState(null);
 
-    // Roles for dropdown
-    const ROLES = ['admin', 'PSP Admin', 'PSP team member', 'smartbin partner', 'smartbin team member', 'super admin'];
+    // Standard LAWMA Team roles matching GET /api/v1/lawma/teams/roles
+    const ROLE_OPTIONS = [
+        { value: 'admin', label: 'Admin' },
+        { value: 'team_member', label: 'Team Member' },
+        { value: 'smartbin_partner', label: 'SmartBin Partner' },
+        { value: 'psp_admin', label: 'PSP Admin' }
+    ];
+    const ROLES = ROLE_OPTIONS.map(r => r.value);
+
+    const roleOptions = useMemo(() => {
+        if (Array.isArray(roles) && roles.length > 0 && (roles[0].displayName || roles[0].name)) {
+            return roles.map(r => ({
+                value: r.name || r.role || r.value,
+                label: r.displayName || r.label || r.name || r.role
+            }));
+        }
+        return ROLE_OPTIONS;
+    }, [roles]);
 
     // Modules for dropdown
     const [modules, setModules] = useState([{ name: "", privileges: [] }]);
@@ -323,34 +143,6 @@ const TeamManagement = () => {
                 }))
             };
 
-            if (import.meta.env.DEV) {
-                // Simulate API call in development
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-                if (isEditRoleMode) {
-                    // Update existing role
-                    const updatedRole = {
-                        ...editingRole,
-                        role: newRoleName.trim(),
-                        permission: validModules.map(m => m.name).join(', ')
-                    };
-                    setRoles(prevRoles => prevRoles.map(role => 
-                        role.id === editingRole.id ? updatedRole : role
-                    ));
-                    showNotification('Role updated successfully!', 'success');
-                } else {
-                    // Add new role
-                    const newRole = {
-                        id: roles.length + 1,
-                        role: newRoleName.trim(),
-                        permission: validModules.map(m => m.name).join(', '),
-                        members: 0,
-                        dateCreated: new Date().toISOString().split('T')[0]
-                    };
-                    setRoles([...roles, newRole]);
-                    showNotification('Role created successfully!', 'success');
-                }
-            } else {
                 if (isEditRoleMode) {
                     // Update existing role
                     const { data } = await api.put(`/corporate/roles/${editingRole.id}`, roleData);
@@ -378,7 +170,6 @@ const TeamManagement = () => {
                         showNotification(data.message || 'Failed to create role.', 'error');
                     }
                 }
-            }
         } catch (error) {
             console.error(`Error ${isEditRoleMode ? 'updating' : 'creating'} role:`, error);
             showNotification(`An error occurred while ${isEditRoleMode ? 'updating' : 'creating'} the role.`, 'error');
@@ -492,7 +283,7 @@ const TeamManagement = () => {
         if (roleToEdit) {
             setEditingRole(roleToEdit);
             setNewRoleName(roleToEdit.role);
-            // For demo purposes, we'll create a default module structure
+            // Default module structure
             // In a real app, you'd fetch the role's modules from the API
             setModules([{ name: roleToEdit.permission, privileges: ["View", "Edit"] }]);
             setIsEditRoleMode(true);
@@ -509,11 +300,11 @@ const TeamManagement = () => {
         );
         if (memberToEdit) {
             setEditingMember(memberToEdit);
-            setNewName(memberToEdit.name);
-            setNewEmail(memberToEdit.email);
-            setNewPhone(memberToEdit.phoneNumber || memberToEdit.phone);
-            setNewRole(memberToEdit.role);
-            setNewStatus(memberToEdit.status);
+            setNewName(memberToEdit.name || '');
+            setNewEmail(memberToEdit.email || '');
+            setNewPhone(memberToEdit.phoneNumber || memberToEdit.phone || '');
+            setNewRole(memberToEdit.role || 'admin');
+            setNewStatus(memberToEdit.status || 'Active');
             setIsEditMode(true);
             setRowActionModal(false);
             setActiveTab('members');
@@ -537,28 +328,18 @@ const TeamManagement = () => {
         setIsRemovingRole(true);
 
         try {
-            if (import.meta.env.DEV) {
-                // Simulate API call in development
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                // Remove role from local state
-                setRoles(prevRoles => prevRoles.filter(role => role.id !== currentRoleId));
-                
+            // Make actual API call
+            const { data } = await api.delete(`/corporate/roles/${currentRoleId}`);
+            
+            if (data.success) {
+                // Refresh roles list
+                const rolesData = await api.get('/corporate/roles');
+                if (rolesData.data.success) {
+                    setRoles(rolesData.data.data);
+                }
                 showNotification('Role removed successfully!', 'success');
             } else {
-                // Make actual API call
-                const { data } = await api.delete(`/corporate/roles/${currentRoleId}`);
-                
-                if (data.success) {
-                    // Refresh roles list
-                    const rolesData = await api.get('/corporate/roles');
-                    if (rolesData.data.success) {
-                        setRoles(rolesData.data.data);
-                    }
-                    showNotification('Role removed successfully!', 'success');
-                } else {
-                    showNotification(data.message || 'Failed to remove role.', 'error');
-                }
+                showNotification(data.message || 'Failed to remove role.', 'error');
             }
         } catch (error) {
             console.error('Error removing role:', error);
@@ -594,24 +375,33 @@ const TeamManagement = () => {
             }));
             setTeamMembers(members);
 
-            // Fetch roles (separate try-catch to not affect team members)
+            // Fetch roles (from lawma teams roles endpoint)
             try {
-                const { data: rolesData } = await api.get('/corporate/roles');
-                const roles = Array.isArray(rolesData) ? rolesData : rolesData?.data || [];
-                setRoles(roles);
+                const { data: rolesResponse } = await api.get('/lawma/teams/roles');
+                const rawRoles = rolesResponse?.data || (Array.isArray(rolesResponse) ? rolesResponse : []);
+                if (Array.isArray(rawRoles) && rawRoles.length > 0) {
+                    const mappedRoles = rawRoles.map((r, idx) => ({
+                        id: r._id || r.id || idx + 1,
+                        name: r.name,
+                        displayName: r.displayName || r.name,
+                        role: r.displayName || r.name,
+                        permission: r.permission || 'Standard Access',
+                        members: r.members || 0,
+                        dateCreated: r.dateCreated || new Date().toISOString().split('T')[0]
+                    }));
+                    setRoles(mappedRoles);
+                } else {
+                    setRoles([]);
+                }
             } catch (rolesError) {
-                console.error('Error fetching roles:', rolesError);
-                setRoles(demoRoles);
+                console.error('Error fetching lawma roles:', rolesError);
+                setRoles([]);
             }
 
         } catch (error) {
             console.error('Error fetching team members:', error);
-            // Fallback to demo data
-            if (import.meta.env.DEV) {
-                await new Promise(resolve => setTimeout(resolve, 2000));
-            }
-            setTeamMembers(demoTeamMembers);
-            setRoles(demoRoles);
+            setTeamMembers([]);
+            setRoles([]);
         } finally {
             setIsLoading(false);
         }
@@ -716,17 +506,16 @@ const TeamManagement = () => {
     }, [roles, searchTerm, sortConfig]);
 
     // Pagination calculations
-    const totalPages = Math.ceil((activeTab === 'members' ? filteredMembers.length : filteredRoles.length) / itemsPerPage);
+    const totalItems = activeTab === 'members' ? filteredMembers.length : filteredRoles.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentPageItems = activeTab === 'members'
-        ? filteredMembers.slice(startIndex, endIndex)
-        : filteredRoles.slice(startIndex, endIndex);
+    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+    const currentPageItems = (activeTab === 'members' ? filteredMembers : filteredRoles).slice(startIndex, endIndex);
 
     // Reset to first page when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchTerm, activeTab]);
+    }, [searchTerm, activeTab, itemsPerPage]);
 
     // Pagination navigation functions
     const goToNextPage = () => {
@@ -735,6 +524,46 @@ const TeamManagement = () => {
 
     const goToPreviousPage = () => {
         setCurrentPage(prev => Math.max(prev - 1, 1));
+    };
+
+    const goToPage = (pageNumber) => {
+        if (typeof pageNumber === 'number' && pageNumber >= 1 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisiblePages = 5;
+
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            const startPage = Math.max(1, currentPage - 1);
+            const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            if (startPage > 1) {
+                pages.push(1);
+                if (startPage > 2) {
+                    pages.push('...');
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                pages.push(i);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    pages.push('...');
+                }
+                pages.push(totalPages);
+            }
+        }
+
+        return pages;
     };
 
     // Handle sorting
@@ -765,59 +594,38 @@ const TeamManagement = () => {
             return;
         }
 
-        const mockSuccess = Math.random() > 0.2; // 80% success rate for demo
-
         setIsLoading(true);
         try {
             if (isEditMode) {
                 // Update existing member
                 const memberId = editingMember._id || editingMember.id;
                 const { data } = await api.patch(`/lawma/teams/${memberId}`, {
-                    name: newName,
-                    email: newEmail,
-                    phoneNumber: newPhone,
+                    name: newName.trim(),
+                    email: newEmail.trim().toLowerCase(),
+                    phoneNumber: newPhone.trim(),
                     role: newRole,
-                    // status: newStatus
                 });
                 showNotification('Team member updated successfully!', 'success');
-
-                if (mockSuccess) {
-                    // Update local list
-                    setTeamMembers(prev => prev.map(member => 
-                        member.id === editingMember.id 
-                        ? { ...member, name: newName, email: newEmail, phone: newPhone, role: newRole, status: newStatus }
-                        : member
-                    )                    );
-                } else {
-                    showNotification('Failed to update team member. Please try again.', 'error');
-                }
+                await fetchTeamMembers();
             } else {
                 // Add new member
                 const { data } = await api.post('/lawma/teams', {
-                    name: newName,
-                    email: newEmail,
-                    phoneNumber: newPhone,
+                    name: newName.trim(),
+                    email: newEmail.trim().toLowerCase(),
+                    phoneNumber: newPhone.trim(),
                     role: newRole,
-                    // status: newStatus
                 });
 
-                if (mockSuccess) {
-                    showNotification('Team member added successfully!', 'success');
-                    // Add to local list
-                    setTeamMembers(prev => [...prev, {
-                        id: Date.now(),
-                        name: newName,
-                        email: newEmail,
-                        phone: newPhone,
-                        role: newRole,
-                        status: newStatus
-                    }]);
-                } else {
-                    showNotification('Failed to add team member. Please try again.', 'error');
-                }
+                showNotification('Team member added successfully!', 'success');
+                await fetchTeamMembers();
             }
         } catch (error) {
-            showNotification(`An error occurred while ${isEditMode ? 'updating' : 'adding'} the member.`, `${error}`);
+            console.error('Error saving team member:', error);
+            const errData = error?.response?.data;
+            const errMsg = Array.isArray(errData?.message)
+                ? errData.message.join(', ')
+                : (errData?.message || error?.message || `An error occurred while ${isEditMode ? 'updating' : 'adding'} the member.`);
+            showNotification(errMsg, 'error');
         } finally {
             setIsLoading(false);
             setIsModalOpen(false);
@@ -831,7 +639,7 @@ const TeamManagement = () => {
         setNewName('');
         setNewEmail('');
         setNewPhone('');
-        setNewRole('Admin');
+        setNewRole('admin');
         setNewStatus('Active');
     };
 
@@ -960,29 +768,77 @@ const TeamManagement = () => {
 
     // Pagination Component
     const PaginationComponent = () => {
-        if (totalPages <= 1) return null;
+        const currentStart = totalItems === 0 ? 0 : startIndex + 1;
+        const currentEnd = Math.min(startIndex + itemsPerPage, totalItems);
 
         return (
-            <div className="flex items-center justify-between mt-5">
-                <div className="flex items-center text-sm text-zinc-700">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 py-4 px-2 bg-white rounded-xl border border-zinc-200 shadow-sm">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-600">
                     <span>
-                        Page {currentPage} of {totalPages}
+                        Showing <span className="font-semibold text-zinc-900">{currentStart}</span> to{' '}
+                        <span className="font-semibold text-zinc-900">{currentEnd}</span> of{' '}
+                        <span className="font-semibold text-zinc-900">{totalItems}</span> {activeTab === 'members' ? 'members' : 'roles'}
                     </span>
+                    <div className="flex items-center gap-2">
+                        <label htmlFor="itemsPerPageSelect" className="text-zinc-500 text-xs uppercase font-medium">
+                            Per page:
+                        </label>
+                        <select
+                            id="itemsPerPageSelect"
+                            value={itemsPerPage}
+                            onChange={(e) => {
+                                setItemsPerPage(Number(e.target.value));
+                                setCurrentPage(1);
+                            }}
+                            className="py-1 px-2 text-sm border border-zinc-300 rounded-lg bg-white focus:ring focus:ring-green-700 focus:outline-none cursor-pointer"
+                        >
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1">
                     <button
                         onClick={goToPreviousPage}
                         disabled={currentPage === 1}
-                        className="px-3 py-2 text-sm font-medium text-zinc-700 bg-zinc-300 border border-zinc-300 hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                        title="Previous page"
                     >
                         <ChevronLeftIcon className="h-4 w-4" />
                     </button>
 
+                    {getPageNumbers().map((page, index) => {
+                        if (page === '...') {
+                            return (
+                                <span key={`ellipsis-${index}`} className="px-2 py-1 text-sm text-zinc-400">
+                                    ...
+                                </span>
+                            );
+                        }
+                        const isCurrent = currentPage === page;
+                        return (
+                            <button
+                                key={page}
+                                onClick={() => goToPage(page)}
+                                className={`px-3 py-1.5 text-sm font-medium rounded-lg transition ${
+                                    isCurrent
+                                        ? 'bg-green-700 text-white font-semibold shadow-sm'
+                                        : 'bg-white text-zinc-700 border border-zinc-300 hover:bg-zinc-50'
+                                }`}
+                            >
+                                {page}
+                            </button>
+                        );
+                    })}
+
                     <button
                         onClick={goToNextPage}
-                        disabled={currentPage === totalPages}
-                        className="px-3 py-2 text-sm font-medium text-white bg-green-700 border border-zinc-300 hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={currentPage >= totalPages || totalItems === 0}
+                        className="p-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                        title="Next page"
                     >
                         <ChevronRightIcon className="h-4 w-4" />
                     </button>
@@ -1257,7 +1113,9 @@ const TeamManagement = () => {
                                                             <td className="px-4 py-3 text-sm text-zinc-900 whitespace-nowrap">{member.name}</td>
                                                             <td className="px-4 py-3 text-sm text-zinc-700 whitespace-nowrap">{member.email}</td>
                                                             <td className="px-4 py-3 text-sm text-zinc-700 whitespace-nowrap">{member.phone || member.phoneNumber}</td>
-                                                            <td className="px-4 py-3 text-sm text-zinc-700 whitespace-nowrap">{member.role}</td>
+                                                            <td className="px-4 py-3 text-sm text-zinc-700 whitespace-nowrap">
+                                                                {roleOptions.find(r => r.value === member.role)?.label || member.role || 'N/A'}
+                                                            </td>
                                                             <td className="px-4 py-3 text-sm whitespace-nowrap">
                                                                 <StatusBadge status={member.status} />
                                                             </td>
@@ -1332,6 +1190,19 @@ const TeamManagement = () => {
                                                     required
                                                 />
                                             </div>
+                                             <div className="mb-4">
+                                                 <label htmlFor="role" className="block text-sm font-medium text-zinc-700 mb-1">Role</label>
+                                                 <select
+                                                     id="role"
+                                                     value={newRole}
+                                                     onChange={(e) => setNewRole(e.target.value)}
+                                                     className="w-full lg:p-4 p-2 border border-zinc-300 rounded-2xl focus:ring focus:outline-none focus:ring-green-700 focus:border-green-700"
+                                                 >
+                                                     {roleOptions.map(role => (
+                                                         <option key={role.value} value={role.value}>{role.label}</option>
+                                                     ))}
+                                                 </select>
+                                             </div>
                                             <div className="mb-4">
                                                 <label htmlFor="email" className="block text-sm font-medium text-zinc-700 mb-1">Email Address</label>
                                                 <input
@@ -1356,19 +1227,7 @@ const TeamManagement = () => {
                                                     required
                                                 />
                                             </div>
-                                            <div className="mb-4">
-                                                <label htmlFor="role" className="block text-sm font-medium text-zinc-700 mb-1">Role</label>
-                                                <select
-                                                    id="role"
-                                                    value={newRole}
-                                                    onChange={(e) => setNewRole(e.target.value)}
-                                                    className="w-full lg:p-4 p-2 border border-zinc-300 rounded-2xl focus:ring focus:outline-none focus:ring-green-700 focus:border-green-700"
-                                                >
-                                                    {ROLES.map(role => (
-                                                        <option key={role} value={role}>{role}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
+
                                             
                                             {/* Submit button */}
                                             <div className="flex justify-end">

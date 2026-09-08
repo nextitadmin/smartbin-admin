@@ -16,42 +16,6 @@ const defaultReportData = {
     items: [],
 };
 
-// Dummy data for simulation
-const dummyReportData = {
-    reportTitle: 'Q2 Smart Bin Report',
-    reportPeriod: 'Apr 1 - Jun 30',
-    generatedDate: '2025-07-15T14:30:00Z',
-    totalBinsOrdered: 42,
-    items: [
-        { sn: 1, id: '1', orderId: 'ORD001', date: '2025-04-05', address: '123 Main St, Lagos', branch: 'Lagos Branch', status: 'DELIVERED' },
-        { sn: 2, id: '2', orderId: 'ORD002', date: '2025-04-08', address: '456 Park Ave, Abuja', branch: 'Abuja Branch', status: 'ACTIVATED' },
-        { sn: 3, id: '3', orderId: 'ORD003', date: '2025-04-12', address: '789 Beach Rd, Port Harcourt', branch: 'Port Harcourt Branch', status: 'SCHEDULED FOR DELIVERY' },
-        { sn: 4, id: '4', orderId: 'ORD004', date: '2025-04-15', address: '101 Hilltop Dr, Enugu', branch: 'Enugu Branch', status: 'PENDING' },
-        { sn: 5, id: '5', orderId: 'ORD005', date: '2025-04-18', address: '202 Riverside Cres, Kano', branch: 'Kano Branch', status: 'INVENTORY' },
-        { sn: 6, id: '6', orderId: 'ORD006', date: '2025-04-22', address: '303 Mountain View, Ibadan', branch: 'Ibadan Branch', status: 'DELIVERED' },
-        { sn: 7, id: '7', orderId: 'ORD007', date: '2025-04-25', address: '404 Lakeside Blvd, Benin', branch: 'Benin Branch', status: 'ACTIVATED' },
-        { sn: 8, id: '8', orderId: 'ORD008', date: '2025-04-28', address: '505 Oceanview St, Calabar', branch: 'Calabar Branch', status: 'SCHEDULED FOR DELIVERY' },
-        { sn: 9, id: '9', orderId: 'ORD009', date: '2025-05-02', address: '606 Forest Ln, Jos', branch: 'Jos Branch', status: 'PENDING' },
-        { sn: 10, id: '10', orderId: 'ORD010', date: '2025-05-05', address: '707 Desert Rd, Maiduguri', branch: 'Maiduguri Branch', status: 'INVENTORY' },
-        { sn: 11, id: '11', orderId: 'ORD011', date: '2025-05-09', address: '808 Savannah Ave, Sokoto', branch: 'Sokoto Branch', status: 'DELIVERED' },
-        { sn: 12, id: '12', orderId: 'ORD012', date: '2025-05-12', address: '909 Jungle St, Uyo', branch: 'Uyo Branch', status: 'ACTIVATED' },
-        { sn: 13, id: '13', orderId: 'ORD013', date: '2025-05-15', address: '1000 Rainforest Dr, Minna', branch: 'Minna Branch', status: 'SCHEDULED FOR DELIVERY' },
-        { sn: 14, id: '14', orderId: 'ORD014', date: '2025-05-18', address: '1100 Grassland Rd, Akure', branch: 'Akure Branch', status: 'PENDING' },
-        { sn: 15, id: '15', orderId: 'ORD015', date: '2025-05-22', address: '1200 Wetland Ave, Owerri', branch: 'Owerri Branch', status: 'INVENTORY' },
-    ]
-};
-
-const simulateUpdateData = async () => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (Math.random() > 0.3) {
-                resolve({ success: true, message: "Update was successful!" });
-            } else {
-                reject({ success: false, message: "Update failed. Please try again." });
-            }
-        }, 1500);
-    });
-};
 // --- End Data Layer ---
 
 
@@ -79,7 +43,6 @@ const SmartBinReport = () => {
     const { id } = useParams();
     const [reportData, setReportData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
-    const [isUpdating, setIsUpdating] = useState(false);
     const [notification, setNotification] = useState({ show: false, type: '', message: '' });
 
     // State for sorting and pagination
@@ -140,9 +103,8 @@ const SmartBinReport = () => {
             setIsLoading(false);
         } catch (error) {
             console.log('Error is ', error);
-            // Fallback to dummy data on error
-            setReportData(dummyReportData);
-            setNotification({ show: true, type: 'error', message: 'Failed to load data. Showing sample data.' });
+            setReportData({ items: [] });
+            setNotification({ show: true, type: 'error', message: 'Failed to load bin report data.' });
             setIsLoading(false);
         }
     }
@@ -159,19 +121,7 @@ const SmartBinReport = () => {
         return () => clearTimeout(timer);
     }, [notification.show]);
 
-    const handleSimulateUpdate = async () => {
-        setIsUpdating(true);
-        setNotification({ show: false, type: '', message: '' });
-        try {
-            const response = await simulateUpdateData({ reportId: reportData?.reportTitle, timestamp: new Date() });
-            setNotification({ show: true, type: 'success', message: response.message });
-        } catch (error) {
-            const errorMessage = error?.message || "An unknown error occurred during the update.";
-            setNotification({ show: true, type: 'error', message: errorMessage });
-        } finally {
-            setIsUpdating(false);
-        }
-    };
+
 
     const getStatusClass = (status) => {
         switch (status?.toLowerCase()) {
@@ -399,15 +349,7 @@ const SmartBinReport = () => {
                                                 </div>
                                             )}
 
-                                            {/* Simulate Update Button */}
-                                            <div className="my-6  justify-end hidden">
-                                                <button
-                                                    onClick={handleSimulateUpdate}
-                                                    disabled={isUpdating || isLoading}
-                                                    className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg flex items-center disabled:opacity-60 disabled:cursor-not-allowed text-sm transition-colors duration-150">
-                                                    {isUpdating && <LoadingSpinner className="text-white mr-2 h-4 w-4" />} {isUpdating ? 'Processing...' : 'Simulate Update'}
-                                                </button>
-                                            </div>
+
 
                                             {/* Table Section */}
                                             <div className="overflow-x-auto pb-4">

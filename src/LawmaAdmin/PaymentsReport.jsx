@@ -24,39 +24,6 @@ const defaultReportData = {
     transactions: [],
 };
 
-// Dummy data for simulation
-const dummyReportData = {
-    title: 'Q2 Payment Report',
-    generatedDate: '2025-07-15T14:30:00Z',
-    dateRange: 'Apr 1 - Jun 30',
-    totalPaymentMade: 2500000,
-    smartBinPurchaseTotal: 1000000,
-    wasteDisposalTotal: 750000,
-    walletFundingTotal: 500000,
-    subscriptionFundingTotal: 250000,
-    smartBinPurchaseProgress: 40,
-    wasteDisposalProgress: 30,
-    walletFundingProgress: 20,
-    subscriptionFundingProgress: 10,
-    transactions: [
-        { sn: 1, id: 'TXN001', receiptId: 'RCPT001', service: 'Smart Bin Purchase', amount: 50000, paymentMethod: 'Credit Card', date: '2025-04-15' },
-        { sn: 2, id: 'TXN002', receiptId: 'RCPT002', service: 'Waste Disposal', amount: 25000, paymentMethod: 'Bank Transfer', date: '2025-04-18' },
-        { sn: 3, id: 'TXN003', receiptId: 'RCPT003', service: 'Wallet Top-Up', amount: 10000, paymentMethod: 'PayPal', date: '2025-04-20' },
-        { sn: 4, id: 'TXN004', receiptId: 'RCPT004', service: 'Subscription', amount: 15000, paymentMethod: 'Credit Card', date: '2025-04-22' },
-        { sn: 5, id: 'TXN005', receiptId: 'RCPT005', service: 'Smart Bin Purchase', amount: 75000, paymentMethod: 'Bank Transfer', date: '2025-05-01' },
-        { sn: 6, id: 'TXN006', receiptId: 'RCPT006', service: 'Waste Disposal', amount: 30000, paymentMethod: 'Credit Card', date: '2025-05-05' },
-        { sn: 7, id: 'TXN007', receiptId: 'RCPT007', service: 'Wallet Top-Up', amount: 20000, paymentMethod: 'PayPal', date: '2025-05-10' },
-        { sn: 8, id: 'TXN008', receiptId: 'RCPT008', service: 'Subscription', amount: 15000, paymentMethod: 'Bank Transfer', date: '2025-05-15' },
-        { sn: 9, id: 'TXN009', receiptId: 'RCPT009', service: 'Smart Bin Purchase', amount: 100000, paymentMethod: 'Credit Card', date: '2025-05-20' },
-        { sn: 10, id: 'TXN010', receiptId: 'RCPT010', service: 'Waste Disposal', amount: 35000, paymentMethod: 'Credit Card', date: '2025-05-25' },
-        { sn: 11, id: 'TXN011', receiptId: 'RCPT011', service: 'Wallet Top-Up', amount: 25000, paymentMethod: 'Bank Transfer', date: '2025-06-01' },
-        { sn: 12, id: 'TXN012', receiptId: 'RCPT012', service: 'Subscription', amount: 15000, paymentMethod: 'PayPal', date: '2025-06-05' },
-        { sn: 13, id: 'TXN013', receiptId: 'RCPT013', service: 'Smart Bin Purchase', amount: 125000, paymentMethod: 'Credit Card', date: '2025-06-10' },
-        { sn: 14, id: 'TXN014', receiptId: 'RCPT014', service: 'Waste Disposal', amount: 40000, paymentMethod: 'Bank Transfer', date: '2025-06-15' },
-        { sn: 15, id: 'TXN015', receiptId: 'RCPT015', service: 'Wallet Top-Up', amount: 30000, paymentMethod: 'Credit Card', date: '2025-06-20' },
-    ],
-};
-
 
 
 // --- Helper Functions ---
@@ -124,77 +91,60 @@ const PaymentReportPage = () => {
     }
 
     const fetchData = async () => {
-
-
-
-
         try {
             setIsLoading(true);
             setError(null);
             setSuccess(null);
 
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // Check if we should use dummy data (when no real API data is available)
-            const useDummyData = !localStorage.getItem('paymentHistory');
-
-            if (useDummyData) {
-                // Use dummy data for simulation and format the date
-                setReportData({
-                    ...dummyReportData,
-                    generatedDate: formatGenerationDate(dummyReportData.generatedDate)
-                });
-                setIsLoading(false);
-                return;
-            }
-
-            // Original API call logic
-            const paymentData = JSON.parse(localStorage.getItem('paymentHistory'));
-            if (!paymentData) {
+            const rawPaymentData = localStorage.getItem('paymentHistory');
+            if (!rawPaymentData) {
                 setReportData({ transactions: [] });
                 setError('No payment report found in localStorage.');
                 setIsLoading(false);
                 return;
             }
 
-            const { data } = await api.get(`/corporate/reports/${paymentData}`);
+            let paymentData;
+            try {
+                paymentData = JSON.parse(rawPaymentData);
+            } catch {
+                paymentData = rawPaymentData;
+            }
+            const reportId = typeof paymentData === 'object' && paymentData !== null ? (paymentData.id ?? paymentData.s_n ?? paymentData.reportId) : paymentData;
+
+            const { data } = await api.get(`/corporate/reports/${reportId}`);
             if (data.success) {
-                const reportsData = data.data.data.records.map((item, index) => ({
+                const reportsData = (data.data?.data?.records || []).map((item, index) => ({
                     sn: index + 1,
                     id: item.transactionId,
                     receiptId: item.receiptId,
                     service: item.service,
                     amount: item.amount,
                     paymentMethod: item.paymentMethod,
-                    date: item.paidAt.slice(0, 10),
+                    date: item.paidAt ? item.paidAt.slice(0, 10) : '',
                 }));
 
                 setReportData({
                     title: data.data.reportName || "",
                     dateRange: formatPeriodArrow(data.data.period) || " ",
                     generatedDate: formatGenerationDate(data.data.generatedAt),
-                    totalPaymentMade: data.data.data.chartSummary.totalPayment || 0,
-                    smartBinPurchaseTotal: data.data.data.chartSummary.breakdown["Smart Bin Purchase"].totalAmount || 0,
-                    smartBinPurchaseProgress: data.data.data.chartSummary.breakdown["Smart Bin Purchase"].percentage || 0,
-                    wasteDisposalTotal: data.data.data.chartSummary.breakdown["Waste Bin Disposal"].totalAmount || 0,
-                    wasteDisposalProgress: data.data.data.chartSummary.breakdown["Waste Bin Disposal"].percentage || 0,
-                    walletFundingTotal: data.data.data.chartSummary.breakdown["Wallet Top-Up"].totalAmount || 0,
-                    walletFundingProgress: data.data.data.chartSummary.breakdown["Wallet Top-Up"].percentage || 0,
-                    subscriptionFundingTotal: data.data.data.chartSummary.breakdown["Subscription"].totalAmount || 0,
-                    subscriptionFundingProgress: data.data.data.chartSummary.breakdown["Subscription"].percentage || 0,
+                    totalPaymentMade: data.data.data?.chartSummary?.totalPayment || 0,
+                    smartBinPurchaseTotal: data.data.data?.chartSummary?.breakdown?.["Smart Bin Purchase"]?.totalAmount || 0,
+                    smartBinPurchaseProgress: data.data.data?.chartSummary?.breakdown?.["Smart Bin Purchase"]?.percentage || 0,
+                    wasteDisposalTotal: data.data.data?.chartSummary?.breakdown?.["Waste Bin Disposal"]?.totalAmount || 0,
+                    wasteDisposalProgress: data.data.data?.chartSummary?.breakdown?.["Waste Bin Disposal"]?.percentage || 0,
+                    walletFundingTotal: data.data.data?.chartSummary?.breakdown?.["Wallet Top-Up"]?.totalAmount || 0,
+                    walletFundingProgress: data.data.data?.chartSummary?.breakdown?.["Wallet Top-Up"]?.percentage || 0,
+                    subscriptionFundingTotal: data.data.data?.chartSummary?.breakdown?.["Subscription"]?.totalAmount || 0,
+                    subscriptionFundingProgress: data.data.data?.chartSummary?.breakdown?.["Subscription"]?.percentage || 0,
                     transactions: reportsData
                 });
             }
             setIsLoading(false);
         } catch (error) {
             console.log("Error is ", error);
-            // Fallback to dummy data on error and format the date
-            setReportData({
-                ...dummyReportData,
-                generatedDate: formatGenerationDate(dummyReportData.generatedDate)
-            });
-            setError('Failed to load data. Showing sample data.');
+            setError('Failed to load payment report.');
+            setReportData({ transactions: [] });
             setIsLoading(false);
         }
     }

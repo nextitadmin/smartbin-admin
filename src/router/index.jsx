@@ -13,6 +13,9 @@ import PSPsTeamMembersRoutes from "./PSPsTeamMemberRoutes";
 const App = lazy(() => import("../pages/App"));
 const Confirmation = lazy(() => import("../pages/Confirmation"));
 const SuccessVerification = lazy(() => import("../pages/SuccessVerification"));
+const ForgotPassword = lazy(() => import("../pages/ForgotPassword"));
+const ConfirmPasswordOtp = lazy(() => import("../pages/ConfirmPasswordOtp"));
+const EnterNewPassword = lazy(() => import("../pages/EnterNewPassword"));
 const ErrorPage = lazy(() => import("../pages/404"));
 
 
@@ -63,6 +66,38 @@ export default function RouterWrapper() {
           element: (
             <Suspense fallback={<LoadingComponent />}>
               <App />
+            </Suspense>
+          ),
+        },
+        {
+          path: "/resetpassword",
+          element: (
+            <Suspense fallback={<LoadingComponent />}>
+              <ForgotPassword />
+            </Suspense>
+          ),
+        },
+        {
+          path: "/forgotpassword",
+          element: (
+            <Suspense fallback={<LoadingComponent />}>
+              <ForgotPassword />
+            </Suspense>
+          ),
+        },
+        {
+          path: "/passwordotp",
+          element: (
+            <Suspense fallback={<LoadingComponent />}>
+              <ConfirmPasswordOtp />
+            </Suspense>
+          ),
+        },
+        {
+          path: "/enternewpassword",
+          element: (
+            <Suspense fallback={<LoadingComponent />}>
+              <EnterNewPassword />
             </Suspense>
           ),
         },

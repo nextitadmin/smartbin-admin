@@ -48,30 +48,7 @@ const ChevronRightIcon = () => (
 );
 
 
-// --- MOCK DATA ---
-// This function generates mock data. In a real application, you would replace this with an API call.
-const generateMockData = () => {
-    const firstNames = ["Olabankole", "Chiamaka", "Boluwatife", "Adebayo", "Ngozi", "Tariq", "Fatima"];
-    const lastNames = ["Kolawole", "Okafor", "Adeyemi", "Abiodun", "Eze", "Balogun", "Suleiman"];
-    const lgas = ["Ibeju-Lekki", "Ikorodu", "Surulere", "Ajegunle", "Ikeja", "Lagos Island", "Epe"];
-    const statuses = ["Pending", "Delivered", "Scheduled", "Activated", "Inventory"];
 
-    let data = [];
-    for (let i = 1; i <= 25; i++) {
-        const date = new Date(2023, 8, Math.floor(Math.random() * 30) + 1, Math.floor(Math.random() * 24), Math.floor(Math.random() * 60));
-        data.push({
-            id: `#090${i.toString().padStart(2, '0')}A`,
-            name: `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
-            phone: `081${Math.floor(10000000 + Math.random() * 90000000)}`,
-            lga: lgas[Math.floor(Math.random() * lgas.length)],
-            orderDate: date,
-            status: statuses[Math.floor(Math.random() * statuses.length)],
-        });
-    }
-    return data;
-};
-
-const mockOrders = generateMockData();
 
 // --- COMPONENTS ---
 
@@ -308,6 +285,7 @@ const OrderTable = ({ orders }) => {
 
 export default function OrderManagement() {
     const [activeTab, setActiveTab] = useState('Pending requests');
+    const [orders, setOrders] = useState([]);
 
     const filteredOrders = useMemo(() => {
         const tabStatusMap = {
@@ -321,11 +299,11 @@ export default function OrderManagement() {
         const statusToFilter = tabStatusMap[activeTab];
 
         if (statusToFilter) {
-            return mockOrders.filter(order => order.status === statusToFilter);
+            return orders.filter(order => order.status === statusToFilter);
         }
 
-        return mockOrders; // Default to all if no specific tab is matched
-    }, [activeTab]);
+        return orders; // Default to all if no specific tab is matched
+    }, [activeTab, orders]);
 
     return (
         <div className="flex min-h-screen bg-zinc-50">
@@ -341,28 +319,28 @@ export default function OrderManagement() {
                             <StatCard
                                 icon={<DocumentTextIcon />}
                                 title="Total orders"
-                                value="1,024"
+                                value="0"
                                 bgColor="bg-white"
                                 textColor="text-zinc-600"
                             />
                             <StatCard
                                 icon={<BanknotesIcon />}
                                 title="Order value"
-                                value="₦1,000,000"
+                                value="₦0"
                                 bgColor="bg-white"
                                 textColor="text-zinc-600"
                             />
                             <StatCard
 
                                 title="On going orders"
-                                value="24"
+                                value="0"
                                 bgColor="bg-orange-400"
                                 textColor="text-white"
                             />
                             <StatCard
 
                                 title="Completed orders"
-                                value="1,000"
+                                value="0"
                                 bgColor="bg-green-500"
                                 textColor="text-white"
                             />

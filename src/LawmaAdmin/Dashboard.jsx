@@ -15,71 +15,42 @@ import Topbar from "../components/LawmaAdmin/Topbar";
 import { ReceiptIcon, ReceiptTextIcon, PackageDeliveredIcon } from "../components/icons";
 import api from "../api/apiConfig";
 
-//––––––––––––––––––––––––––––––––––––––––––––––––––
-// MOCK DATA (Replace with your API calls)
-//––––––––––––––––––––––––––––––––––––––––––––––––––
-const mockDashboardData = {
+// Default initial state
+const defaultDashboardData = {
   stats: [
-    { title: "Smart Bin Requests", value: 500000, icon: <ReceiptIcon /> },
+    { title: "Smart Bin Requests", value: 0, icon: <ReceiptIcon /> },
     {
       title: "Pending Smart Bin Requests",
-      value: 400000,
+      value: 0,
       icon: <ReceiptTextIcon />,
     },
-    { title: "Completed Smart Bin Requests", value: 400000, icon: <PackageDeliveredIcon /> },
+    { title: "Completed Smart Bin Requests", value: 0, icon: <PackageDeliveredIcon /> },
   ],
   revenue: {
-    total: 40000000000,
-    change: 2.6,
-    // Note: Recharts data values are just for chart shape, not the displayed total.
+    total: 0,
+    change: 0,
     data: [
-      { name: "Jan", revenue: 10 },
-      { name: "Feb", revenue: 15 },
-      { name: "Mar", revenue: 12 },
-      { name: "Apr", revenue: 30 },
-      { name: "May", revenue: 40 },
-      { name: "Jun", revenue: 30 },
-      { name: "Jul", revenue: 35 },
-      { name: "Aug", revenue: 50 },
-      { name: "Sep", revenue: 45 },
-      { name: "Oct", revenue: 25 },
-      { name: "Nov", revenue: 25 },
-      { name: "Dec", revenue: 35 },
+      { name: "Jan", revenue: 0 },
+      { name: "Feb", revenue: 0 },
+      { name: "Mar", revenue: 0 },
+      { name: "Apr", revenue: 0 },
+      { name: "May", revenue: 0 },
+      { name: "Jun", revenue: 0 },
+      { name: "Jul", revenue: 0 },
+      { name: "Aug", revenue: 0 },
+      { name: "Sep", revenue: 0 },
+      { name: "Oct", revenue: 0 },
+      { name: "Nov", revenue: 0 },
+      { name: "Dec", revenue: 0 },
     ],
   },
   users: {
-    total: 1200000,
-    distribution: [
-      // Colors are chosen to match the screenshot
-      {
-        name: "Resident users",
-        value: 983998,
-        percentage: 20,
-        color: "#27AE60",
-      }, // approx. orange-500
-      { name: "Agents", value: 983998, percentage: 30, color: "#ED7C0D" }, // approx. indigo-600
-      {
-        name: "Facility Managers",
-        value: 200839,
-        percentage: 30,
-        color: "#625ED7",
-      }, // approx. indigo-500
-      {
-        name: "Corporate users",
-        value: 200839,
-        percentage: 20,
-        color: "#452A74",
-      }, // approx. orange-600
-    ],
+    total: 0,
+    distribution: [],
   },
   psp: {
-    total: 120,
-    top: [
-      { name: "Eze sons and kids limited", staff: 50 },
-      { name: "Opulent Gsp Properties And Resources", staff: 80 },
-      { name: "Abass cleaning Intl", staff: 200 },
-      { name: "Sonika International Limited", staff: 15 },
-    ],
+    total: 0,
+    top: [],
   },
 };
 
@@ -131,7 +102,7 @@ const transformDashboardResponse = (raw) => {
       name: months[i],
       revenue: toNumber(value),
     }))
-    : mockDashboardData.revenue.data;
+    : defaultDashboardData.revenue.data;
 
   // =============================
   // USERS
@@ -173,7 +144,7 @@ const transformDashboardResponse = (raw) => {
         color: "#452A74",
       },
     ]
-    : mockDashboardData.users.distribution;
+    : [];
 
   // =============================
   // PSP COMPANIES
@@ -185,7 +156,7 @@ const transformDashboardResponse = (raw) => {
       name: p.company_name,
       staff: toNumber(p.teamMembersCount),
     }))
-    : mockDashboardData.psp.top;
+    : [];
 
   // =============================
   // RETURN FINAL STRUCTURE
@@ -346,7 +317,7 @@ export default function DashboardPage() {
   //   }
   // };
 
-  const [dashboardData, setDashboardData] = useState(mockDashboardData);
+  const [dashboardData, setDashboardData] = useState(defaultDashboardData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -365,7 +336,7 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async (year) => {
     if (!DASHBOARD_ENDPOINT) {
-      setDashboardData(mockDashboardData);
+      setDashboardData(defaultDashboardData);
       return;
     }
 
@@ -377,7 +348,7 @@ export default function DashboardPage() {
     } catch (e) {
       console.error("Error fetching dashboard data:", e);
       setError(e?.response?.data?.message || e?.message || "Failed to load dashboard data.");
-      setDashboardData(mockDashboardData);
+      setDashboardData(defaultDashboardData);
     } finally {
       setLoading(false);
     }

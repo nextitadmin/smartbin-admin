@@ -5,22 +5,6 @@ import Papa from 'papaparse';
 import api from '../api/apiConfig';
 import { useNavigate } from 'react-router-dom';
 
-// --- Mock Data ---
-const mockData = [
-    { id: 1, date: '21-01-25', name: 'Olabankole Kolawole', binId: '#OD12589048', binType: 'Smart', lga: 'Ibeju-Lekki', address: '23, Association Dr, Dolphin estate, Lagos' },
-    { id: 2, date: '22-01-25', name: 'Adewale Johnson', binId: '#OD12589049', binType: 'Non-Smart', lga: 'Ibeju-Lekki', address: '23, Association Dr, Dolphin estate, Lagos' },
-    { id: 3, date: '24-01-25', name: 'Olabankole Kolawole', binId: '#OD12589050', binType: 'Smart', lga: 'Ajah', address: '23, Association Dr, Dolphin estate, Lagos' },
-    { id: 4, date: '28-01-25', name: 'Maryam Abdullahi', binId: '#OD12589051', binType: 'Non-Smart', lga: 'Ajah', address: '23, Association Dr, Dolphin estate, Lagos' },
-    { id: 5, date: '28-01-25', name: 'Olabankole Kolawole', binId: '#OD12589052', binType: 'Smart', lga: 'Ibeju-Lekki', address: '45, Palm Street, Lekki Phase 1, Lagos' },
-    { id: 6, date: '28-01-25', name: 'Chinedu Eze', binId: '#OD12589053', binType: 'Smart', lga: 'Eti-Osa', address: '23, Association Dr, Dolphin estate, Lagos' },
-    { id: 7, date: '28-01-25', name: 'Olabankole Kolawole', binId: '#OD12589054', binType: 'Smart', lga: 'Ibeju-Lekki', address: '23, Association Dr, Dolphin estate, Lagos' },
-    { id: 8, date: '28-01-25', name: 'Adewale Johnson', binId: '#OD12589055', binType: 'Non-Smart', lga: 'Eti-Osa', address: '12, Victoria Island, Lagos' },
-    { id: 9, date: '28-01-25', name: 'Olabankole Kolawole', binId: '#OD12589056', binType: 'Non-Smart', lga: 'Ibeju-Lekki', address: '23, Association Dr, Dolphin estate, Lagos' },
-    { id: 10, date: '28-01-25', name: 'Maryam Abdullahi', binId: '#OD12589057', binType: 'Non-Smart', lga: 'Ajah', address: '7, Lekki Gardens, Lagos' },
-    { id: 11, date: '28-01-25', name: 'Olabankole Kolawole', binId: '#OD12589058', binType: 'Non-Smart', lga: 'Ibeju-Lekki', address: '23, Association Dr, Dolphin estate, Lagos' },
-    { id: 12, date: '28-01-25', name: 'Chinedu Eze', binId: '#OD12589059', binType: 'Smart', lga: 'Eti-Osa', address: '23, Association Dr, Dolphin estate, Lagos' },
-    { id: 13, date: '28-01-25', name: 'Olabankole Kolawole', binId: '#OD12589060', binType: 'Smart', lga: 'Ibeju-Lekki', address: '23, Association Dr, Dolphin estate, Lagos' },
-];
 
 // --- SVG Icons ---
 import {
@@ -476,9 +460,8 @@ export default function DeliveredSmartBins() {
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching delivered bins:', error);
-                // Fallback to mock data in case of error
-                setBins(mockData);
-                setFilteredBins(mockData);
+                setBins([]);
+                setFilteredBins([]);
                 setLoading(false);
             }
         };

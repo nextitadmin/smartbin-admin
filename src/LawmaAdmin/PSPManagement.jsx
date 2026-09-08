@@ -13,117 +13,7 @@ import { fetchPSPs, createPSP, deactivatePSP, activatePSP, fetchMembers, changeP
 import api from "../api/apiConfig";
 import PSPManagementSkeletonLoader from "../components/PSPManagementSkeletonLoader";
 
-// --- MOCK DATA & API ---
-// Extracted from the image, to be used as a fallback.
-const mockPspData = [
-  {
-    id: 1,
-    companyName: "Bolaji & Co.",
-    adminName: "Olabanire Kolawole",
-    lga: "Lekki/LCDA",
-    dateAdded: "2025-09-25",
-    status: "Active",
-    address: "Step 2, Nkeuku Rd, Oweri, Lekki",
-    phone: "08183294578",
-    amacNo: "AMA/COS/124",
-    wasteDisposed: 142,
-    collectionMethod: "LLC",
-  },
-  {
-    id: 2,
-    companyName: "Solar Waste Ltd.",
-    adminName: "Adebayo Funmi",
-    lga: "Ikeja",
-    dateAdded: "2025-09-25",
-    status: "Active",
-    address: "123 Allen Avenue, Ikeja, Lagos",
-    phone: "08012345678",
-    amacNo: "AMA/IKE/125",
-    wasteDisposed: 200,
-    collectionMethod: "Door-to-door",
-  },
-  {
-    id: 3,
-    companyName: "GreenScape Inc.",
-    adminName: "Chidi Okoro",
-    lga: "Ikorodu",
-    dateAdded: "2025-09-25",
-    status: "Active",
-    address: "456 Sagamu Road, Ikorodu, Lagos",
-    phone: "08023456789",
-    amacNo: "AMA/IKO/126",
-    wasteDisposed: 180,
-    collectionMethod: "LLC",
-  },
-  {
-    id: 4,
-    companyName: "Metro Cleaners",
-    adminName: "Fatima Bello",
-    lga: "Surulere",
-    dateAdded: "2025-09-24",
-    status: "Active",
-    address: "789 Bode Thomas, Surulere, Lagos",
-    phone: "08034567890",
-    amacNo: "AMA/SUR/127",
-    wasteDisposed: 250,
-    collectionMethod: "Community Bin",
-  },
-  {
-    id: 5,
-    companyName: "Eco Warriors",
-    adminName: "Samson Adeoye",
-    lga: "Apapa",
-    dateAdded: "2025-09-23",
-    status: "Inactive",
-    address: "101 Warehouse Rd, Apapa, Lagos",
-    phone: "08045678901",
-    amacNo: "AMA/APA/128",
-    wasteDisposed: 95,
-    collectionMethod: "LLC",
-  },
-  {
-    id: 6,
-    companyName: "Waste Masters",
-    adminName: "Ngozi Eze",
-    lga: "Epe",
-    dateAdded: "2025-09-22",
-    status: "Active",
-    address: "212 Marina Rd, Epe, Lagos",
-    phone: "08056789012",
-    amacNo: "AMA/EPE/129",
-    wasteDisposed: 130,
-    collectionMethod: "Door-to-door",
-  },
-  {
-    id: 7,
-    companyName: "City Recyclers",
-    adminName: "Ibrahim Musa",
-    lga: "Badagry",
-    dateAdded: "2025-09-21",
-    status: "Active",
-    address: "321 Seme Border Rd, Badagry, Lagos",
-    phone: "08067890123",
-    amacNo: "AMA/BAD/130",
-    wasteDisposed: 160,
-    collectionMethod: "LLC",
-  },
-];
 
-// Mock API query that simulates a network request. It has a 20% chance of failing.
-const fetchPspsApi = () => {
-  console.log("Fetching data from API...");
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (Math.random() > 0.2) {
-        console.log("API call successful.");
-        resolve(JSON.parse(JSON.stringify(mockPspData)));
-      } else {
-        console.error("API call failed.");
-        reject(new Error("Failed to fetch data from the server."));
-      }
-    }, 1000); // 1-second delay
-  });
-};
 
 // --- SVG ICONS (Raw from Heroicons) ---
 
@@ -367,19 +257,7 @@ function PSPManagement() {
       setLgas(lgaList);
     } catch (error) {
       console.error('Error fetching LGAs:', error);
-      // Fallback to mock LGAs if API fails
-      setLgas([
-        { id: 1, name: "Lekki/LCDA" },
-        { id: 2, name: "Ikeja" },
-        { id: 3, name: "Ikorodu" },
-        { id: 4, name: "Surulere" },
-        { id: 5, name: "Apapa" },
-        { id: 6, name: "Epe" },
-        { id: 7, name: "Badagry" },
-        { id: 8, name: "Alimosho" },
-        { id: 9, name: "Kosofe" },
-        { id: 10, name: "Mushin" }
-      ]);
+      setLgas([]);
     } finally {
       setLoadingLgas(false);
     }
@@ -453,8 +331,7 @@ function PSPManagement() {
       })
       .catch((err) => {
         setError(err?.response?.data?.message || err.message || "Failed to load PSPs");
-        console.log("Fallback to mock data.");
-        setPsps(JSON.parse(JSON.stringify(mockPspData)));
+        setPsps([]);
         setLoading(false);
       });
   }, [loadMemberCounts]);
@@ -829,9 +706,6 @@ function PSPManagement() {
               ) : error ? (
                 <div className="bg-white rounded-2xl shadow-sm p-6 text-center text-red-600">
                   <p>{error}</p>
-                  <p className="text-zinc-500 text-sm">
-                    Displaying cached mock data.
-                  </p>
                 </div>
               ) : (
                 <div className="bg-white rounded-2xl shadow-sm overflow-x-auto">

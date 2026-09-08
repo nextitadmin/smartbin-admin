@@ -17,38 +17,7 @@ const defaultReportData = {
     }
 };
 
-// Dummy data for simulation
-const dummyReportData = {
-    reports: [
-        { sn: 1, id: "1", wasteId: "WST001", date: "2025-04-05T10:30:00Z", address: "123 Main St, Lagos", branch: "Lagos Branch", weightKgTon: 150, status: "DELIVERED" },
-        { sn: 2, id: "2", wasteId: "WST002", date: "2025-04-06T14:15:00Z", address: "456 Park Ave, Abuja", branch: "Abuja Branch", weightKgTon: 200, status: "DELIVERED" },
-        { sn: 3, id: "3", wasteId: "WST003", date: "2025-04-07T09:45:00Z", address: "789 Beach Rd, Port Harcourt", branch: "Port Harcourt Branch", weightKgTon: 175, status: "DELIVERED" },
-        { sn: 4, id: "4", wasteId: "WST004", date: "2025-04-08T16:20:00Z", address: "101 Hilltop Dr, Enugu", branch: "Enugu Branch", weightKgTon: 120, status: "CANCELLED" },
-        { sn: 5, id: "5", wasteId: "WST005", date: "2025-04-09T11:30:00Z", address: "202 Riverside Cres, Kano", branch: "Kano Branch", weightKgTon: 180, status: "DELIVERED" },
-        { sn: 6, id: "6", wasteId: "WST006", date: "2025-04-10T13:45:00Z", address: "303 Mountain View, Ibadan", branch: "Ibadan Branch", weightKgTon: 160, status: "DELIVERED" },
-        { sn: 7, id: "7", wasteId: "WST007", date: "2025-04-11T08:30:00Z", address: "404 Lakeside Blvd, Benin", branch: "Benin Branch", weightKgTon: 140, status: "DELIVERED" },
-        { sn: 8, id: "8", wasteId: "WST008", date: "2025-04-12T15:15:00Z", address: "505 Oceanview St, Calabar", branch: "Calabar Branch", weightKgTon: 190, status: "CANCELLED" },
-        { sn: 9, id: "9", wasteId: "WST009", date: "2025-04-13T10:00:00Z", address: "606 Forest Ln, Jos", branch: "Jos Branch", weightKgTon: 155, status: "DELIVERED" },
-        { sn: 10, id: "10", wasteId: "WST010", date: "2025-04-14T12:30:00Z", address: "707 Desert Rd, Maiduguri", branch: "Maiduguri Branch", weightKgTon: 165, status: "DELIVERED" },
-        { sn: 11, id: "11", wasteId: "WST011", date: "2025-04-15T14:45:00Z", address: "808 Savannah Ave, Sokoto", branch: "Sokoto Branch", weightKgTon: 170, status: "DELIVERED" },
-        { sn: 12, id: "12", wasteId: "WST012", date: "2025-04-16T09:15:00Z", address: "909 Jungle St, Uyo", branch: "Uyo Branch", weightKgTon: 145, status: "CANCELLED" },
-        { sn: 13, id: "13", wasteId: "WST013", date: "2025-04-17T11:30:00Z", address: "1000 Rainforest Dr, Minna", branch: "Minna Branch", weightKgTon: 185, status: "DELIVERED" },
-        { sn: 14, id: "14", wasteId: "WST014", date: "2025-04-18T13:00:00Z", address: "1100 Grassland Rd, Akure", branch: "Akure Branch", weightKgTon: 150, status: "DELIVERED" },
-        { sn: 15, id: "15", wasteId: "WST015", date: "2025-04-19T15:45:00Z", address: "1200 Wetland Ave, Owerri", branch: "Owerri Branch", weightKgTon: 175, status: "DELIVERED" },
-    ],
-    chartDetails: [
-        { month: "Apr 2025", wasteCount: 15 },
-        { month: "May 2025", wasteCount: 18 },
-        { month: "Jun 2025", wasteCount: 12 },
-    ],
-    summary: {
-        period: { from: "01/04", to: "30/06" },
-        generationDate: "2025-07-15T14:30:00Z",
-        title: "Q2 Waste Disposal Report",
-        totalDisposed: 45,
-        totalWeight: 2450,
-    }
-};
+
 
 
 
@@ -94,49 +63,45 @@ const WasteReports = () => {
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Check if we should use dummy data (when no real API data is available)
-            const useDummyData = !localStorage.getItem('wastereport');
-            
-            if (useDummyData) {
-                // Use dummy data for simulation
-                setReports(dummyReportData.reports);
-                setChartDetails(dummyReportData.chartDetails);
-                setSummary(dummyReportData.summary);
-                setIsLoading(false);
-                return;
-            }
-            
-            // Original API call logic
-            const wasteData = JSON.parse(localStorage.getItem('wastereport'));
-            if (!wasteData) {
+
+            const rawWasteData = localStorage.getItem('wastereport');
+            if (!rawWasteData) {
                 setReports([]);
-                setNotification({ show: true, type: 'error', message: 'No bin report found in localStorage.' });
+                setNotification({ show: true, type: 'error', message: 'No waste report found in localStorage.' });
                 setIsLoading(false);
                 return;
             }
-            const { data } = await api.get(`/corporate/reports/${wasteData}`);
+
+            let wasteData;
+            try {
+                wasteData = JSON.parse(rawWasteData);
+            } catch {
+                wasteData = rawWasteData;
+            }
+            const reportId = typeof wasteData === 'object' && wasteData !== null ? (wasteData.id ?? wasteData.s_n ?? wasteData.reportId) : wasteData;
+
+            const { data } = await api.get(`/corporate/reports/${reportId}`);
             if (data.success) {
-                const pickupArray = data.data.data.pickups;
+                const pickupArray = data.data?.data?.pickups || [];
                 const reportsData = pickupArray.map((item, index) => ({
                     sn: index + 1,
                     id: item.orderId,
                     wasteId: item?.orderId || item?.transactionReference,
-                    date: item.pickupDate || "2025-08-02T16:22:29.491Z",
+                    date: item.pickupDate || "",
                     address: item.address,
                     branch: item.branch,
                     weightKgTon: item.weight || "0",
-                    status: item.status.toUpperCase(),
+                    status: (item.status || '').toUpperCase(),
                 }));
                 setReports(reportsData);
 
                 const monthlyFrequencyMap = {};
 
                 pickupArray.forEach(pickup => {
-                    const month = format(parseISO(pickup.pickupDate || "2025-07-02T16:22:29.491Z"), 'MMM yyyy');
-                    monthlyFrequencyMap[month] = (monthlyFrequencyMap[month] || 0) + 1;
+                    if (pickup.pickupDate) {
+                        const month = format(parseISO(pickup.pickupDate), 'MMM yyyy');
+                        monthlyFrequencyMap[month] = (monthlyFrequencyMap[month] || 0) + 1;
+                    }
                 });
 
                 // Convert map to sorted array
@@ -158,14 +123,13 @@ const WasteReports = () => {
             setIsLoading(false);
         } catch (error) {
             console.log("Error is ", error);
-            // Fallback to dummy data on error
-            setReports(dummyReportData.reports);
-            setChartDetails(dummyReportData.chartDetails);
-            setSummary(dummyReportData.summary);
-            setNotification({ show: true, type: 'error', message: 'Failed to load data. Showing sample data.' });
+            setReports([]);
+            setChartDetails([]);
+            setSummary({});
+            setNotification({ show: true, type: 'error', message: 'Failed to load waste report data.' });
             setIsLoading(false);
         }
-    }
+    };
     useEffect(() => {
         fetchData();
 

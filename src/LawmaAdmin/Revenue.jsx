@@ -5,34 +5,22 @@ import Topbar from '../components/LawmaAdmin/Topbar';
 import PaymentTable from '../components/LawmaAdmin/PaymentTable';
 // import { useNavigate } from 'react-router-dom';
 
-// --- MOCK DATA ---
-// Mock data for the revenue chart. In a real app, you'd fetch this.
 const chartData = [
-    { name: 'Jan', revenue: 12000000 },
-    { name: 'Feb', revenue: 18000000 },
-    { name: 'Mar', revenue: 15000000 },
-    { name: 'Apr', revenue: 28000000 },
-    { name: 'May', revenue: 35000000 },
-    { name: 'Jun', revenue: 32000000 },
-    { name: 'Jul', revenue: 41000000 },
-    { name: 'Aug', revenue: 48000000 },
-    { name: 'Sep', revenue: 40000000 },
-    { name: 'Oct', revenue: 25000000 },
-    { name: 'Nov', revenue: 28000000 },
-    { name: 'Dec', revenue: 38000000 },
+    { name: 'Jan', revenue: 0 },
+    { name: 'Feb', revenue: 0 },
+    { name: 'Mar', revenue: 0 },
+    { name: 'Apr', revenue: 0 },
+    { name: 'May', revenue: 0 },
+    { name: 'Jun', revenue: 0 },
+    { name: 'Jul', revenue: 0 },
+    { name: 'Aug', revenue: 0 },
+    { name: 'Sep', revenue: 0 },
+    { name: 'Oct', revenue: 0 },
+    { name: 'Nov', revenue: 0 },
+    { name: 'Dec', revenue: 0 },
 ];
 
-// Mock data for the payments table.
-const initialPaymentDetails = [
-    { s_n: 1, paymentId: '#OD12589048', revenueSource: 'Waste Collection', amount: 20000, date: '2025-05-26', paymentMethod: 'Alat by Wema', status: 'Successful' },
-    { s_n: 2, paymentId: '#OD12589049', revenueSource: 'Smart Bin purchase', amount: 20000, date: '2025-05-26', paymentMethod: 'In app wallet', status: 'Successful' },
-    { s_n: 3, paymentId: '#OD12589050', revenueSource: 'Waste Collection', amount: 20000, date: '2025-05-26', paymentMethod: 'In app wallet', status: 'Failed' },
-    { s_n: 4, paymentId: '#OD12589051', revenueSource: 'Waste Collection', amount: 20000, date: '2025-05-26', paymentMethod: 'Alat by Wema', status: 'Pending' },
-    { s_n: 5, paymentId: '#OD12589052', revenueSource: 'Smart Bin purchase', amount: 20000, date: '2025-05-26', paymentMethod: 'Alat by Wema', status: 'Successful' },
-    { s_n: 6, paymentId: '#OD12589053', revenueSource: 'Waste Disposal', amount: 15000, date: '2025-05-25', paymentMethod: 'Card', status: 'Successful' },
-    { s_n: 7, paymentId: '#OD12589054', revenueSource: 'Smart Bin purchase', amount: 75000, date: '2025-05-24', paymentMethod: 'In app wallet', status: 'Pending' },
-    { s_n: 8, paymentId: '#OD12589055', revenueSource: 'Waste Collection', amount: 22000, date: '2025-05-23', paymentMethod: 'Alat by Wema', status: 'Failed' },
-];
+const initialPaymentDetails = [];
 
 // --- SVG ICONS (Heroicons) ---
 const ChevronDownIcon = ({ className = "w-5 h-5" }) => (
@@ -74,24 +62,24 @@ const StatCards = () => (
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
         }}>
             <p className="text-sm">Total amount generated overtime</p>
-            <p className="text-4xl font-bold mt-2">₦ 70,900,000</p>
+            <p className="text-4xl font-bold mt-2">₦ 0</p>
         </div>
         {/* Sub Stat Cards */}
         <div className="flex-1 bg-white rounded-xl border border-zinc-200 p-6 flex flex-col justify-center gap-4">
             <div className="flex justify-between items-center">
                 <div>
                     <p className="text-zinc-500 text-sm">Smart Bin Application</p>
-                    <p className="text-zinc-800 font-bold text-lg">₦8,000,000</p>
+                    <p className="text-zinc-800 font-bold text-lg">₦0</p>
                 </div>
-                <p className="text-zinc-500 text-sm">10,000 transactions</p>
+                <p className="text-zinc-500 text-sm">0 transactions</p>
             </div>
             <div className="border-t border-zinc-200"></div>
             <div className="flex justify-between items-center">
                 <div>
                     <p className="text-zinc-500 text-sm">Waste Disposal</p>
-                    <p className="text-zinc-800 font-bold text-lg">₦8,000,000</p>
+                    <p className="text-zinc-800 font-bold text-lg">₦0</p>
                 </div>
-                <p className="text-zinc-500 text-sm">800 transactions</p>
+                <p className="text-zinc-500 text-sm">0 transactions</p>
             </div>
         </div>
     </div>
@@ -103,9 +91,7 @@ const RevenueChart = () => (
             <div>
                 <p className="text-zinc-500 text-sm">Total revenue</p>
                 <div className="flex items-end gap-3">
-                    <p className="text-3xl font-bold text-zinc-800">₦ 400,000,000.00</p>
-                    <span className="text-sm font-semibold text-green-600">+2.6%</span>
-                    <span className="text-sm text-zinc-500">vs Last Year</span>
+                    <p className="text-3xl font-bold text-zinc-800">₦ 0.00</p>
                 </div>
             </div>
             <div className="mt-4 sm:mt-0">

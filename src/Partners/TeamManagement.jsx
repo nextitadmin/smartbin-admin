@@ -8,129 +8,7 @@ import api from '../api/apiConfig';
 import { PlusIcon, MagnifyingGlassIcon, XMarkIcon, EllipsisVerticalIcon, CheckCircleIconSolid, ExclamationTriangleIconSolid, LoadingSpinnerIcon, SortIcon, ChevronLeftIcon, ChevronRightIcon } from '../components/icons';
 import SkeletonLoader from '../components/SkeletonLoader';
 
-// Demo Data (as per image)
-const demoTeamMembers = [
-    {
-        id: 1,
-        name: 'Adebimpe Soriyan',
-        email: 'adebimpe.soriyan@lawma.gov.ng',
-        phone: '08029389102',
-        role: 'Super Admin',
-        status: 'Active'
-    },
-    {
-        id: 2,
-        name: 'Bolanle Toju',
-        email: 'bolanle.toju@lawma.gov.ng',
-        phone: '08032784726',
-        role: 'Admin',
-        status: 'Active'
-    },
-    {
-        id: 3,
-        name: 'Faridat Deola',
-        email: 'faridat.deola@lawma.gov.ng',
-        phone: '08142904836',
-        role: 'Manager',
-        status: 'Deactivated'
-    },
-    {
-        id: 4,
-        name: 'Martins Madueke',
-        email: 'martins.madueke@lawma.gov.ng',
-        phone: '07023780192',
-        role: 'Supervisor',
-        status: 'Deactivated'
-    },
-    {
-        id: 5,
-        name: 'Fisayo Mabel',
-        email: 'fisayo.mabel@lawma.gov.ng',
-        phone: '09011892739',
-        role: 'Analyst',
-        status: 'Active'
-    },
-    {
-        id: 6,
-        name: 'Fidelis James',
-        email: 'fidelis.james@lawma.gov.ng',
-        phone: '07038902948',
-        role: 'Coordinator',
-        status: 'Active'
-    },
-    {
-        id: 7,
-        name: 'Grace Okonkwo',
-        email: 'grace.okonkwo@lawma.gov.ng',
-        phone: '08123456789',
-        role: 'Manager',
-        status: 'Active'
-    },
-    {
-        id: 8,
-        name: 'Chinedu Okafor',
-        email: 'chinedu.okafor@lawma.gov.ng',
-        phone: '08098765432',
-        role: 'Supervisor',
-        status: 'Deactivated'
-    },
-    {
-        id: 9,
-        name: 'Amina Hassan',
-        email: 'amina.hassan@lawma.gov.ng',
-        phone: '07012345678',
-        role: 'Analyst',
-        status: 'Active'
-    },
-    {
-        id: 10,
-        name: 'Emmanuel Adebayo',
-        email: 'emmanuel.adebayo@lawma.gov.ng',
-        phone: '09087654321',
-        role: 'Coordinator',
-        status: 'Active'
-    },
-    {
-        id: 11,
-        name: 'Patience Nwosu',
-        email: 'patience.nwosu@lawma.gov.ng',
-        phone: '08134567890',
-        role: 'Admin',
-        status: 'Active'
-    },
-    {
-        id: 12,
-        name: 'Ibrahim Mohammed',
-        email: 'ibrahim.mohammed@lawma.gov.ng',
-        phone: '08076543210',
-        role: 'Supervisor',
-        status: 'Active'
-    },
-    {
-        id: 13,
-        name: 'Blessing Okafor',
-        email: 'blessing.okafor@lawma.gov.ng',
-        phone: '07098765432',
-        role: 'Analyst',
-        status: 'Deactivated'
-    },
-    {
-        id: 14,
-        name: 'Samuel Johnson',
-        email: 'samuel.johnson@lawma.gov.ng',
-        phone: '08123456789',
-        role: 'Manager',
-        status: 'Active'
-    },
-    {
-        id: 15,
-        name: 'Victoria Eze',
-        email: 'victoria.eze@lawma.gov.ng',
-        phone: '08012345678',
-        role: 'Coordinator',
-        status: 'Active'
-    }
-];
+
 
 
 // Main Component
@@ -308,17 +186,7 @@ const TeamManagement = () => {
 
         } catch (error) {
             console.error('Error fetching team members:', error);
-            // Fallback to demo data
-            if (import.meta.env.DEV) {
-                await new Promise(resolve => setTimeout(resolve, 2000));
-            }
-            // Add task fields to demo data
-            const demoDataWithTasks = demoTeamMembers.map(member => ({
-                ...member,
-                taskAssigned: Math.floor(Math.random() * 20),
-                taskCompleted: Math.floor(Math.random() * 15)
-            }));
-            setTeamMembers(demoDataWithTasks);
+            setTeamMembers([]);
         } finally {
             setIsLoading(false);
         }
@@ -442,8 +310,6 @@ const TeamManagement = () => {
             return;
         }
 
-        const mockSuccess = Math.random() > 0.2; // 80% success rate for demo
-
         setIsLoading(true);
         try {
             if (isEditMode) {
@@ -452,49 +318,35 @@ const TeamManagement = () => {
                 const { data } = await api.patch(`/lawma/teams/${memberId}`, {
                     name: newName,
                     email: newEmail,
-                    // phoneNumber: newPhone,
-                    // role: newRole,
-                    // status: newStatus
                 });
                 showNotification('Team member updated successfully!', 'success');
 
-                if (mockSuccess) {
-                    // Update local list
-                    setTeamMembers(prev => prev.map(member => 
-                        member.id === editingMember.id 
-                        ? { ...member, name: newName, email: newEmail, phone: newPhone, role: newRole, status: newStatus }
-                        : member
-                    )                    );
-                } else {
-                    showNotification('Failed to update team member. Please try again.', 'error');
-                }
+                // Update local list
+                setTeamMembers(prev => prev.map(member => 
+                    member.id === editingMember.id 
+                    ? { ...member, name: newName, email: newEmail, phone: newPhone, role: newRole, status: newStatus }
+                    : member
+                ));
             } else {
                 // Add new member
                 const { data } = await api.post('/lawma/teams', {
                     name: newName,
                     email: newEmail,
-                    // phoneNumber: newPhone,
-                    // role: newRole,
-                    // status: newStatus
                 });
 
-                if (mockSuccess) {
-                    showNotification('Team member added successfully!', 'success');
-                    // Add to local list
-                    setTeamMembers(prev => [...prev, {
-                        id: Date.now(),
-                        name: newName,
-                        email: newEmail,
-                        phone: newPhone,
-                        role: newRole,
-                        status: newStatus
-                    }]);
-                } else {
-                    showNotification('Failed to add team member. Please try again.', 'error');
-                }
+                showNotification('Team member added successfully!', 'success');
+                const newMember = data?.data || data || {};
+                setTeamMembers(prev => [...prev, {
+                    id: newMember.id || newMember._id || Date.now(),
+                    name: newName,
+                    email: newEmail,
+                    phone: newPhone,
+                    role: newRole,
+                    status: newStatus
+                }]);
             }
         } catch (error) {
-            showNotification(`An error occurred while ${isEditMode ? 'updating' : 'adding'} the member.`, `${error}`);
+            showNotification(error?.response?.data?.message || `An error occurred while ${isEditMode ? 'updating' : 'adding'} the member.`, 'error');
         } finally {
             setIsLoading(false);
             setIsModalOpen(false);

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import api from '../../api/apiConfig';
 
 // --- SVG Icon Components (Raw Hero Icons) ---
 
@@ -111,13 +112,11 @@ const GenerateReportModal = ({ isOpen, onClose }) => {
     const [reportType, setReportType] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [primaryEmail, setPrimaryEmail] = useState('jidemomodu@gmail.com');
+    const [primaryEmail, setPrimaryEmail] = useState('');
     const [secondaryEmails, setSecondaryEmails] = useState([]);
     const [reportSchedule, setReportSchedule] = useState('quarterly');
     const [day, setDay] = useState('thursday');
     const [time, setTime] = useState('09:00');
-
-    const [processingStartTime, setProcessingStartTime] = useState(null);
 
     // Resets the form and closes the modal
     const handleClose = () => {
@@ -152,46 +151,36 @@ const GenerateReportModal = ({ isOpen, onClose }) => {
     };
 
     // --- Form Submission Handler ---
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Here you would normally validate fields
-
-        // Start processing
         setModalState('processing');
-        setProcessingStartTime(Date.now());
-    };
 
-    // --- Effect to manage the 5-second minimum processing & simulation ---
-    useEffect(() => {
-        if (modalState === 'processing' && processingStartTime) {
-            const minDisplayTime = 5000; // 5 seconds
+        try {
+            const reportName = reportType ? `${reportType.replace(/_/g, ' ')} Report` : 'Generated Report';
+            const payload = {
+                reportName,
+                type: reportType === 'bin_request' ? 'smartbin-request' : reportType === 'waste_pickup' ? 'waste-pickup' : reportType === 'revenue' ? 'payment-history' : reportType,
+                startDate: startDate || new Date().toISOString().split('T')[0],
+                endDate: endDate || new Date().toISOString().split('T')[0],
+                reportMethod,
+                primaryEmail,
+                secondaryEmails: secondaryEmails.map(s => s.value).filter(Boolean),
+                schedule: reportSchedule,
+                day,
+                time
+            };
 
-            // Simulate API call duration (e.g., 1s to 3s)
-            const apiCallDuration = Math.random() * 2000 + 1000;
-
-            const apiCallTimer = setTimeout(() => {
-                // 50/50 chance of success or error
-                const isSuccess = Math.random() > 0.5;
-                const nextState = isSuccess ? 'success' : 'error';
-
-                const timeElapsed = Date.now() - processingStartTime;
-                const remainingTime = minDisplayTime - timeElapsed;
-
-                if (remainingTime > 0) {
-                    // If 5s hasn't passed, wait for the remaining time
-                    setTimeout(() => {
-                        setModalState(nextState);
-                    }, remainingTime);
-                } else {
-                    // If 5s has already passed, update state immediately
-                    setModalState(nextState);
-                }
-
-            }, apiCallDuration);
-
-            return () => clearTimeout(apiCallTimer);
+            const { data } = await api.post('/corporate/reports', payload);
+            if (data?.success) {
+                setModalState('success');
+            } else {
+                setModalState('error');
+            }
+        } catch (error) {
+            console.error('Failed to generate report:', error);
+            setModalState('error');
         }
-    }, [modalState, processingStartTime]);
+    };
 
 
     // --- Render Functions for Each Modal State ---

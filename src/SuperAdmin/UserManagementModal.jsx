@@ -29,7 +29,7 @@ const normalizeString = (value) => {
 };
 
 const buildUser = (user) => ({
-  id: user.userId || user.id || user._id || `${user.email}-${Math.random()}`,
+  id: user.userId || user.id || user._id || `${user.email || 'user'}-${Date.now()}`,
   name: normalizeString(user.name || user.fullName || user.username),
   email: normalizeString(user.email || user.businessEmail),
   phone: normalizeString(user.phone || user.phoneNumber || user.businessPhone),

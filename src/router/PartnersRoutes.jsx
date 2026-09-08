@@ -11,8 +11,6 @@ import SmartBinReport from "../Partners/SmartBinReport";
 import WasteReports from "../Partners/WasteReports";
 import ProtectedRoute from "../components/ProtectedRoute";
 
-import OrderManagementModals from "../Partners/OrderManagementModals";
-
 
 const PartnersRoutes = [{
     path: "/dashboard",
@@ -50,16 +48,6 @@ const PartnersRoutes = [{
         <Suspense fallback={<LoadingComponent />}>
             <ProtectedRoute>
                 <AuditManager />
-            </ProtectedRoute>
-        </Suspense>
-    ),
-},
-{
-    path: "/order-management-modals",
-    element: (
-        <Suspense fallback={<LoadingComponent />}>
-            <ProtectedRoute>
-                <OrderManagementModals />
             </ProtectedRoute>
         </Suspense>
     ),

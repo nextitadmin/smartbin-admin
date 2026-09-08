@@ -7,7 +7,6 @@ import PaymentsReport from "../TeamMembers/PaymentsReport";
 import SmartBinReport from "../TeamMembers/SmartBinReport";
 import WasteReports from "../TeamMembers/WasteReports";
 import ProtectedRoute from "../components/ProtectedRoute";
-import TestFinishDelivery from "../TeamMembers/TestFinishDelivery";
 
 
 
@@ -67,16 +66,6 @@ const TeamMembersRoutes = [{
         <Suspense fallback={<LoadingComponent />}>
             <ProtectedRoute>
                 <WasteReports />
-            </ProtectedRoute>
-        </Suspense>
-    ),
-},
-{
-    path: "/test-finish-delivery",
-    element: (
-        <Suspense fallback={<LoadingComponent />}>
-            <ProtectedRoute>
-                <TestFinishDelivery />
             </ProtectedRoute>
         </Suspense>
     ),

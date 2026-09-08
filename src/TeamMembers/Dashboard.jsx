@@ -4,31 +4,7 @@ import Sidebar from "../components/TeamMembers/Sidebar";
 import Topbar from "../components/TeamMembers/Topbar";
 
 
-// --- MOCK API ---
-// This simulates fetching data from an API.
-const mockApi = {
-    getDashboardStats: () => new Promise(resolve => {
-        setTimeout(() => {
-            resolve({
-                totalOrders: 200,
-                totalDelivered: 24,
-                amountGenerated: 1000000,
-            });
-        }, 500);
-    }),
-    getPendingOrders: () => new Promise(resolve => {
-        setTimeout(() => {
-            resolve([
-                { id: 1, orderId: '#0900A', name: 'Olabankole Kolawole', phone: '08129058371', lga: 'Ibeju Lekki', date: 'Today 9:21AM', status: 'Pending' },
-                { id: 2, orderId: '#0900B', name: 'Olabankole Kolawole', phone: '08129058371', lga: 'Ikorodu', date: '09/08/2023 2:33PM', status: 'Pending' },
-                { id: 3, orderId: '#0900C', name: 'Olabankole Kolawole', phone: '08129058371', lga: 'Ikorodu', date: '09/08/2023 2:33PM', status: 'Pending' },
-                { id: 4, orderId: '#0900D', name: 'Olabankole Kolawole', phone: '08129058371', lga: 'Surulere', date: '09/08/2023 2:33PM', status: 'Pending' },
-                { id: 5, orderId: '#0900E', name: 'Olabankole Kolawole', phone: '08129058371', lga: 'Ajegunle', date: '09/08/2023 2:33PM', status: 'Pending' },
-                { id: 6, orderId: '#0900F', name: 'Another Person', phone: '08012345678', lga: 'Ikeja', date: '10/08/2023 11:00AM', status: 'Pending' },
-            ]);
-        }, 800);
-    }),
-};
+import api from "../api/apiConfig";
 
 // --- SVG ICONS ---
 // Using raw SVG for icons as requested.
@@ -193,9 +169,8 @@ const PendingOrdersTable = ({ orders, isLoading }) => {
 };
 
 
-// Main App Component (Dashboard Page)
 export default function App() {
-    const [stats, setStats] = useState({});
+    const [stats, setStats] = useState({ totalOrders: 0, totalDelivered: 0, amountGenerated: 0 });
     const [orders, setOrders] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -203,14 +178,27 @@ export default function App() {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                const [statsData, ordersData] = await Promise.all([
-                    mockApi.getDashboardStats(),
-                    mockApi.getPendingOrders()
-                ]);
-                setStats(statsData);
-                setOrders(ordersData);
+                const { data } = await api.get('/corporate/orders');
+                const rawOrders = Array.isArray(data) ? data : data?.data || [];
+                const mappedOrders = rawOrders.map((o, idx) => ({
+                    id: o._id || o.id || idx + 1,
+                    orderId: o.orderId || o.applicationId || o._id || `#${idx + 1}`,
+                    name: o.customer?.name || o.name || 'N/A',
+                    phone: o.customer?.phone || o.phone || 'N/A',
+                    lga: o.customer?.lga || o.lga || 'N/A',
+                    date: o.date || (o.createdAt ? new Date(o.createdAt).toLocaleDateString() : 'N/A'),
+                    status: o.status || 'Pending'
+                }));
+                setOrders(mappedOrders);
+                setStats({
+                    totalOrders: mappedOrders.length,
+                    totalDelivered: mappedOrders.filter(o => o.status === 'Delivered').length,
+                    amountGenerated: 0
+                });
             } catch (error) {
                 console.error("Failed to fetch dashboard data:", error);
+                setStats({ totalOrders: 0, totalDelivered: 0, amountGenerated: 0 });
+                setOrders([]);
             } finally {
                 setIsLoading(false);
             }

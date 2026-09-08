@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useOrderStore from '../../../stores/useOrderStore';
-
-// --- Mock Data ---
-// Mock team members as requested due to missing endpoint
-const mockTeamMembers = [
-    { id: 1, name: 'Adewale Adeoye', email: 'adewaleadeoye@email.com' },
-    { id: 2, name: 'Bisi Oladapo', email: 'bisioladapo@email.com' },
-    { id: 3, name: 'Chinedu Okoro', email: 'chineduokoro@email.com' },
-    { id: 4, name: 'Fatima Bello', email: 'fatimabello@email.com' },
-];
+import api from '../../../api/apiConfig';
 
 // --- SVG Icons (Heroicons) ---
 const XMarkIcon = () => (
@@ -37,6 +29,7 @@ export default function ScheduleDeliveryModal({ isOpen, onClose, order: initialO
     // We maintain a local state for the order to reflect immediate changes (like assignment)
     // In a real app, this might be handled by optimistic updates or re-fetching
     const [order, setOrder] = useState(initialOrder);
+    const [teamMembers, setTeamMembers] = useState([]);
     const scheduleOrderDelivery = useOrderStore(state => state.scheduleOrderDelivery);
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -44,73 +37,78 @@ export default function ScheduleDeliveryModal({ isOpen, onClose, order: initialO
         setOrder(initialOrder);
     }, [initialOrder]);
 
+    useEffect(() => {
+        const fetchTeamMembers = async () => {
+            try {
+                const { data } = await api.get('/lawma/teams');
+                const rawMembers = Array.isArray(data) ? data : data?.data || [];
+                const members = rawMembers.map(m => ({
+                    id: m._id || m.id,
+                    name: m.name,
+                    email: m.email
+                }));
+                setTeamMembers(members);
+            } catch (err) {
+                console.error('Failed to fetch team members:', err);
+                setTeamMembers([]);
+            }
+        };
+        if (isOpen) {
+            fetchTeamMembers();
+        }
+    }, [isOpen]);
+
     const [currentView, setCurrentView] = useState('details'); // 'details', 'assign'
 
     // Derived state for assignment
     const assignedMemberName = order?.assignment?.assignedTo?.name || null;
-    const currentAssignee = assignedMemberName ? mockTeamMembers.find(m => m.name === assignedMemberName) : null;
+    const currentAssignee = assignedMemberName ? teamMembers.find(m => m.name === assignedMemberName) : null;
 
-    const [selectedTeamMember, setSelectedTeamMember] = useState(mockTeamMembers[0]);
+    const [selectedTeamMember, setSelectedTeamMember] = useState(null);
     const [comment, setComment] = useState('');
 
     useEffect(() => {
         if (isOpen && order) {
             if (currentAssignee) {
-                // If already assigned, select that member (or reset to default for reassign logic)
-                const assignedMember = mockTeamMembers.find(m => m.name === assignedMemberName);
-                setSelectedTeamMember(assignedMember || mockTeamMembers[0]);
+                setSelectedTeamMember(currentAssignee);
+            } else if (teamMembers.length > 0) {
+                setSelectedTeamMember(teamMembers[0]);
             } else {
-                setSelectedTeamMember(mockTeamMembers[0]);
+                setSelectedTeamMember(null);
             }
         }
-    }, [isOpen, order?.id]); // Depend on ID to reset when order changes
+    }, [isOpen, order?.id, currentAssignee, teamMembers]);
 
     const handleClose = () => {
         onClose();
-        // Reset view to details when closing, after a short delay for the animation
         setTimeout(() => setCurrentView('details'), 300);
     };
 
     const handleGoToAssignView = () => {
         if (currentAssignee) {
-            // If reassigning, try to set default to someone else for convenience
-            const defaultNewMember = mockTeamMembers.find(m => m.name !== assignedMemberName) || mockTeamMembers[0];
+            const defaultNewMember = teamMembers.find(m => m.name !== assignedMemberName) || teamMembers[0] || null;
             setSelectedTeamMember(defaultNewMember);
         } else {
-            setSelectedTeamMember(mockTeamMembers[0]);
+            setSelectedTeamMember(teamMembers[0] || null);
         }
         setCurrentView('assign');
     };
 
     const handleAssignMember = async (e) => {
         e.preventDefault();
+        if (!selectedTeamMember) return;
         setIsProcessing(true);
 
         try {
-            // Use applicationId if available via API field, fallback to ID
             const idToUse = order.applicationId || order.id;
-
-            // API expects teamMemberId, but we only have mock IDs locally. 
-            // In a real scenario, we'd have real IDs from an API. 
-            // For now, let's use the mock ID (integer) or convert to string if API expects string.
-            // Docs say "Team member ObjectId" so likely string. 
-            // Since we lack the Team Member API, we'll try to use a dummy ObjectId if the mock ID fails validation,
-            // or just pass the ID we have. Let's pass a dummy string ID derived from our mock.
-            const teamMemberId = `mock_member_${selectedTeamMember.id}`;
+            const teamMemberId = selectedTeamMember.id || selectedTeamMember._id;
 
             await scheduleOrderDelivery(idToUse, teamMemberId, comment);
 
-            // Optimistic update for UI feel or rely on store refresh (which is called in action)
-            // But let's close/transition
             if (onTransition) {
-                // onTransition('scheduled'); // if there is such a step? 
-                // Usually after scheduling, it goes to "Scheduled for Delivery" status.
-                // We can close.
+                // optional transition callback
             }
-            setCurrentView('details'); // Or close?
-            // Let's go back to details to show success or new status? 
-            // Or just close as successful. 
-            // Assuming workflow: Click Schedule -> Assign -> Done -> Close.
+            setCurrentView('details');
             handleClose();
 
         } catch (error) {
@@ -122,9 +120,9 @@ export default function ScheduleDeliveryModal({ isOpen, onClose, order: initialO
     };
 
     const handleSelectChange = (e) => {
-        const member = mockTeamMembers.find(m => m.name === e.target.value);
-        setSelectedTeamMember(member);
-    }
+        const member = teamMembers.find(m => m.name === e.target.value);
+        setSelectedTeamMember(member || null);
+    };
 
     if (!order) return null;
 
@@ -214,11 +212,12 @@ export default function ScheduleDeliveryModal({ isOpen, onClose, order: initialO
                         <div className="relative">
                             <select
                                 id="team-member"
-                                value={selectedTeamMember.name}
+                                value={selectedTeamMember?.name || ''}
                                 onChange={handleSelectChange}
                                 className="w-full appearance-none bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                             >
-                                {mockTeamMembers.map(member => (
+                                <option value="" disabled>Select team member</option>
+                                {teamMembers.map(member => (
                                     <option key={member.id} value={member.name}>{member.name}</option>
                                 ))}
                             </select>
@@ -233,7 +232,7 @@ export default function ScheduleDeliveryModal({ isOpen, onClose, order: initialO
                             type="email"
                             id="email"
                             readOnly
-                            value={selectedTeamMember.email}
+                            value={selectedTeamMember?.email || ''}
                             className="w-full bg-zinc-100 border border-zinc-300 rounded-lg px-3 py-2 text-zinc-500 cursor-not-allowed"
                         />
                     </div>

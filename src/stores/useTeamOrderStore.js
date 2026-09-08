@@ -108,12 +108,6 @@ const useTeamOrderStore = create((set, get) => ({
   },
 
   updateOrderStatus: async (id, status) => {
-      // Mock handling for test environment
-      if (typeof id === 'string' && id.startsWith('mock-app-id')) {
-          console.log(`[Mock Store] updateOrderStatus called for ${id} with status ${status}`);
-          return Promise.resolve({ success: true, message: "Mock update successful" });
-      }
-
     try {
         await orderService.updateOrderStatus(id, status);
         await get().fetchOrderDetails(id);
@@ -136,12 +130,6 @@ const useTeamOrderStore = create((set, get) => ({
   },
 
   deliverOrder: async (id, deliveryData) => {
-      // Mock handling for test environment
-      if (typeof id === 'string' && id.startsWith('mock-app-id')) {
-          console.log(`[Mock Store] deliverOrder called for ${id}`, deliveryData);
-          return Promise.resolve({ success: true, message: "Mock delivery successful" });
-      }
-
       try {
           await orderService.deliverOrder(id, deliveryData);
           await get().fetchOrderDetails(id);

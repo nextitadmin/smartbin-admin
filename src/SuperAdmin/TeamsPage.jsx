@@ -50,9 +50,10 @@ const TeamsPage = () => {
 
     // Roles for dropdown (display names)
     const ROLE_OPTIONS = [
-        { value: 'super_admin', label: 'Super Admin' },
         { value: 'admin', label: 'Admin' },
-        { value: 'team_member', label: 'Team Member' }
+        { value: 'team_member', label: 'Team Member' },
+        { value: 'smartbin_partner', label: 'SmartBin Partner' },
+        { value: 'psp_admin', label: 'PSP Admin' }
     ];
 
     // Delete confirmation modal
@@ -237,7 +238,7 @@ const TeamsPage = () => {
         setIsEditSaving(false);
     };
 
-    // Export data (mock)
+    // Export data
     const handleExportData = () => {
         setIsExporting(true);
         setTimeout(() => {

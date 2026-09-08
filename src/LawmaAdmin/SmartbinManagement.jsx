@@ -78,7 +78,13 @@ const CustomizedXAxisTick = (props) => {
 // --- Main Component ---
 export default function SmartbinManagement() {
     const navigate = useNavigate();
-    const [stats, setStats] = useState(null);
+    const [stats, setStats] = useState({
+        totalUsers: 0,
+        smartBinRequests: 0,
+        smartBinsDelivered: 0,
+        userDistribution: [],
+        recentlyDelivered: [],
+    });
     const [loading, setLoading] = useState(true);
     const [requestsLoading, setRequestsLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('overview');
@@ -331,7 +337,7 @@ export default function SmartbinManagement() {
         try {
             const response = await api.get('lawma/smartbins/lawma-admin/overview', {
                 params: {
-                    year: overviewYear,
+                    year: Number(overviewYear),
                     binType: overviewBinType
                 }
             });
@@ -368,41 +374,13 @@ export default function SmartbinManagement() {
 
         } catch (error) {
             console.error('Error fetching smartbin overview:', error);
-            // Fallback to mock data in case of error
-            // const mockData = {
-            //     totalUsers: 5000000,
-            //     smartBinRequests: 3000,
-            //     smartBinsDelivered: 400,
-            //     userDistribution: [
-            //         { name: 'AGL', users: 10000 },
-            //         { name: 'KTU', users: 25000 },
-            //         { name: 'FST', users: 28000 },
-            //         { name: 'APP', users: 19000 },
-            //         { name: 'BDG', users: 32000 },
-            //         { name: 'EPE', users: 15000 },
-            //         { name: 'EKY', users: 58000 },
-            //         { name: 'AKD', users: 62000 },
-            //         { name: 'FKJ', users: 78000 },
-            //         { name: 'KJA', users: 32000 },
-            //         { name: 'KRD', users: 14000 },
-            //         { name: 'KSF', users: 70000 }, // This is the highlighted bar
-            //         { name: 'AAA', users: 45000 },
-            //         { name: 'LND', users: 47000 },
-            //         { name: 'MUS', users: 30000 },
-            //         { name: 'LSD', users: 52000 },
-            //         { name: 'SMK', users: 22000 },
-            //         { name: 'LSR', users: 42000 },
-            //         { name: 'GGE', users: 53000 },
-            //     ],
-            //     recentlyDelivered: [
-            //         { sn: 1, date: '21-01-25', binType: 'Smart', binId: '#OD12589048', address: '23, Association Dr, Dolphin estate...' },
-            //         { sn: 2, date: '22-01-25', binType: 'Non smart', binId: '#OD12589048', address: '23, Association Dr, Dolphin estate...' },
-            //         { sn: 3, date: '24-01-25', binType: 'Smart', binId: '#OD12589048', address: '23, Association Dr, Dolphin estate...' },
-            //     ]
-            // };
-            
-            // setStats(mockData);
-            
+            setStats({
+                totalUsers: 0,
+                smartBinRequests: 0,
+                smartBinsDelivered: 0,
+                userDistribution: [],
+                recentlyDelivered: [],
+            });
         }
     }, [overviewYear, overviewBinType]);
 
@@ -469,17 +447,8 @@ export default function SmartbinManagement() {
             
         } catch (error) {
             console.error('Error fetching smartbin requests:', error);
-            // Fallback to mock data in case of error
-            const mockRequests = [
-                { id: 1, name: 'John Doe', customerType: 'Resident', email: 'john@example.com', phone: '+234 801 234 5678', address: '123 Main St, Lagos', status: 'pending', date: '21-01-25', lga: 'Ikeja' },
-                { id: 2, name: 'Jane Smith', customerType: 'Corporate', email: 'jane@example.com', phone: '+234 802 345 6789', address: '456 Oak Ave, Lagos', status: 'approved', date: '22-01-25', approvedDate: '23-01-25', lga: 'Victoria Island' },
-                { id: 3, name: 'Mike Johnson', customerType: 'Facility Manager', email: 'mike@example.com', phone: '+234 803 456 7890', address: '789 Pine St, Lagos', status: 'delivered', date: '23-01-25', deliveredDate: '25-01-25', deliveredBy: 'Fred Chukwuemeka', lga: 'Surulere' },
-                { id: 4, name: 'Sarah Wilson', customerType: 'Resident', email: 'sarah@example.com', phone: '+234 804 567 8901', address: '321 Elm St, Lagos', status: 'pending', date: '24-01-25', lga: 'Ikoyi' },
-                { id: 5, name: 'David Brown', customerType: 'Corporate', email: 'david@example.com', phone: '+234 805 678 9012', address: '654 Maple Ave, Lagos', status: 'pending', date: '25-01-25', lga: 'Lekki' },
-            ];
-            
-            setRequests(mockRequests);
-            
+            setRequests([]);
+            setServerPaging(null);
         }
     };
 

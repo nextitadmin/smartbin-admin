@@ -50,18 +50,35 @@ const useSortableData = (items, config = null) => {
     return { items: sortedItems, requestSort, sortConfig };
 };
 
-const PaymentTable = ({ initialPaymentDetails }) => {
+const ChevronLeftIcon = ({ className = "w-5 h-5" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
+    </svg>
+);
+
+const ChevronRightIcon = ({ className = "w-5 h-5" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+    </svg>
+);
+
+const PaymentTable = ({ 
+    initialPaymentDetails = [], 
+    currentPage = 1, 
+    totalPages = 1, 
+    onPageChange = () => {}, 
+    loading = false 
+}) => {
     const { items: paymentDetails, requestSort, sortConfig } = useSortableData(initialPaymentDetails);
     const navigate = useNavigate();
 
     const headers = [
         { key: 's_n', label: 'S/N' },
-        { key: 'paymentId', label: 'Payment ID' },
-        { key: 'revenueSource', label: 'Revenue Source' },
-        { key: 'amount', label: 'Amount(₦)' },
-        { key: 'date', label: 'Date' },
-        { key: 'paymentMethod', label: 'Payment method' },
-        { key: 'status', label: 'Status' },
+        { key: 'psp_company', label: 'PSP Company' },
+        { key: 'lcda', label: 'LCDA' },
+        { key: 'household_covered', label: 'Household covered' },
+        { key: 'revenue', label: 'Revenue(₦)' },
+        { key: 'outStandingBill', label: 'Bills(₦)' }
     ];
 
     const getSortIndicator = (key) => {
@@ -81,7 +98,7 @@ const PaymentTable = ({ initialPaymentDetails }) => {
     return (
         <div className="mt-6 bg-white rounded-xl border border-zinc-200">
             <div className="p-4 sm:p-6 flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-zinc-800">Payment details</h2>
+                <h2 className="text-lg font-semibold text-zinc-800">PSP revenue</h2>
                 <button onClick={handleViewAll} className="text-sm font-medium text-green-600 hover:text-green-700">View all</button>
             </div>
             <div className="overflow-x-auto">
@@ -100,23 +117,56 @@ const PaymentTable = ({ initialPaymentDetails }) => {
                             ))}
                         </tr>
                     </thead>
-                    <tbody>
-                        {paymentDetails.map((payment) => (
-                            <tr key={payment.s_n} className="bg-white border-b border-zinc-200 hover:bg-zinc-50">
-                                <td className="px-6 py-4">{payment.s_n}</td>
-                                <td className="px-6 py-4 font-medium text-zinc-900">{payment.paymentId}</td>
-                                <td className="px-6 py-4">{payment.revenueSource}</td>
-                                <td className="px-6 py-4">{new Intl.NumberFormat('en-US').format(payment.amount)}</td>
-                                <td className="px-6 py-4">{new Date(payment.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '-')}</td>
-                                <td className="px-6 py-4">{payment.paymentMethod}</td>
-                                <td className="px-6 py-4">
-                                    <StatusBadge status={payment.status} />
+                    <tbody className="relative">
+                        {loading && (
+                            <tr className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10">
+                                <td colSpan={headers.length} className="py-8 text-center text-zinc-500">Loading PSP revenues...</td>
+                            </tr>
+                        )}
+                        {paymentDetails.length === 0 ? (
+                            <tr>
+                                <td colSpan={headers.length} className="px-6 py-10 text-center text-zinc-500">
+                                    No records found.
                                 </td>
                             </tr>
-                        ))}
+                        ) : (
+                            paymentDetails.map((payment) => (
+                                <tr key={payment.id ?? payment.s_n} className="bg-white border-b border-zinc-200 hover:bg-zinc-50">
+                                    <td className="px-6 py-4">{payment.s_n}</td>
+                                    <td className="px-6 py-4 font-medium text-zinc-900">{payment.psp_company}</td>
+                                    <td className="px-6 py-4">{payment.lcda}</td>
+                                    <td className="px-6 py-4">{Number(payment.household_covered ?? 0).toLocaleString()}</td>
+                                    <td className="px-6 py-4">{new Intl.NumberFormat('en-US').format(payment.revenue)}</td>
+                                    <td className="px-6 py-4">{new Intl.NumberFormat('en-US').format(payment.outStandingBill)}</td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex justify-between items-center p-4 sm:p-6 border-t border-zinc-200 bg-zinc-50/50 rounded-b-xl">
+                    <button
+                        onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
+                        disabled={currentPage === 1 || loading}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-700 bg-white border border-zinc-300 rounded-md hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        <ChevronLeftIcon className="w-4 h-4" /> Previous
+                    </button>
+                    <span className="text-sm text-zinc-600">
+                        Page <span className="font-semibold text-zinc-800">{currentPage}</span> of <span className="font-semibold text-zinc-800">{totalPages}</span>
+                    </span>
+                    <button
+                        onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
+                        disabled={currentPage === totalPages || loading}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-700 bg-white border border-zinc-300 rounded-md hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        Next <ChevronRightIcon className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

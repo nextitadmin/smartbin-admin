@@ -3,7 +3,6 @@ import Sidebar from '../components/PSPsTeamMembers/Sidebar';
 import Topbar from '../components/PSPsTeamMembers/Topbar';
 import api from '../api/apiConfig';
 import { useNavigate } from 'react-router-dom';
-import demoReports from '../data/demoReports';
 import SkeletonLoader from '../components/SkeletonLoader';
 import {
     PlusIcon,
@@ -151,16 +150,7 @@ const ReportsPage = () => {
             }
         } catch (error) {
             console.error('Error fetching reports:', error);
-
-            // Fallback to demo data so the screen still works locally if API is unavailable.
-            const reportList = demoReports.map((item) => ({
-                id: item._id,
-                reportType: item.type,
-                reportTitle: item.reportName,
-                period: formatPeriodArrow(item.period),
-                generationDate: item.createdAt
-            }));
-            setReports(reportList);
+            setReports([]);
         } finally {
             setIsLoading(false);
         }

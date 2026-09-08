@@ -1,23 +1,11 @@
 import { create } from 'zustand';
-import { createMockOrder } from '../data/mockOrderData';
 
 const useOrderModalStore = create((set) => ({
   activeModal: null, // 'pending', 'inventory', 'schedule', 'delivered', 'activated' or null
   orderData: null, // The unified order object
 
-  openModal: (modalType, dataOrId) => {
-      let data = dataOrId;
-      // If a string ID is passed, create the mock object
-      if (typeof dataOrId === 'string') {
-          data = createMockOrder(dataOrId);
-          // Set appropriate status based on modal we are opening (for demo consistency)
-          if (modalType === 'pending') data.status = 'Pending';
-          if (modalType === 'inventory') data.status = 'Inventory';
-          if (modalType === 'schedule') data.status = 'Scheduled for delivery'; // or 'Scheduled'
-          if (modalType === 'delivered') data.status = 'Delivered';
-          if (modalType === 'activated') data.status = 'Activated';
-      }
-      set({ activeModal: modalType, orderData: data });
+  openModal: (modalType, order = null) => {
+      set({ activeModal: modalType, orderData: typeof order === 'object' ? order : null });
   },
 
   closeModal: () => set({ activeModal: null, orderData: null }),
