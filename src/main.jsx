@@ -4,10 +4,12 @@ import { RouterProvider } from "react-router-dom";
 
 
 import RouterWrapper from "./router/index";
+import ToastContainer from "./components/ToastContainer";
 
 import "./index.css";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <RouterWrapper />
+    <ToastContainer />
   </StrictMode>
 );

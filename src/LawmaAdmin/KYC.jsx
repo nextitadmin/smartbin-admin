@@ -14,6 +14,7 @@ import {
   CheckCircleIconSolid,
   ExclamationTriangleIconSolid
 } from '../components/icons';
+import { showToast } from '../stores/toastStore';
 
 
 
@@ -52,7 +53,7 @@ const KYC = () => {
   const navigate = useNavigate();
 
 
-  const [notification, setNotification] = useState({ message: '', type: '', visible: false });
+
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterReportType, setFilterReportType] = useState('All');
@@ -119,11 +120,8 @@ const KYC = () => {
     fetchKYCAPI(activeTab, 1);
   }, [activeTab]);
 
-  const showNotification = (message, type) => {
-    setNotification({ message, type, visible: true });
-    setTimeout(() => {
-      setNotification({ message: '', type: '', visible: false });
-    }, 3000);
+  const showNotification = (message, type = 'success') => {
+    showToast(message, type);
   };
 
   const processedReports = useMemo(() => {
@@ -552,17 +550,6 @@ const KYC = () => {
             <main className="p-4 md:px-4">
 
               <div className=" p-4 md:p-8 font-sans">
-                {notification.visible && (
-                  <div className={`fixed top-5 right-5 z-50 p-4 rounded-md shadow-lg text-white flex items-center space-x-2
-          ${notification.type === 'success' ? 'bg-green-700' : 'bg-red-500'}`}
-                  >
-                    {notification.type === 'success' ? <CheckCircleIconSolid className="h-5 w-5" /> : <ExclamationTriangleIconSolid className="h-5 w-5" />}
-                    <span>{notification.message}</span>
-                    <button onClick={() => setNotification({ ...notification, visible: false })} className="ml-auto">
-                      <XMarkIcon className="h-5 w-5" />
-                    </button>
-                  </div>
-                )}
 
                 <header className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
                   <div>
