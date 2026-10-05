@@ -237,7 +237,7 @@ const KYC = () => {
   function normalizeUserType(rawType) {
     const value = sanitizeUserType(rawType).toLowerCase();
     if (!value) return '';
-    if (['facility manager', 'facility_manager', 'facilitymanager'].includes(value)) return 'facility manager';
+    if (['facility manager', 'facility_manager', 'facilitymanager', 'facility'].includes(value)) return 'facility manager';
     if (['resident'].includes(value)) return 'resident';
     if (['corporate', 'corporate customer', 'corporate_user'].includes(value)) return 'corporate';
     if (['agent', 'field agent'].includes(value)) return 'agent';
@@ -281,10 +281,16 @@ const KYC = () => {
   const handleViewDetails = async (report) => {
     try {
       // Fetch detailed KYC data
-      const detailedData = await fetchDetailedKYCData(report.id);
+      const kycId = report.id || report._id;
+      const detailedData = await fetchDetailedKYCData(kycId);
       if (detailedData) {
         // Merge the detailed data with the existing report data
-        const enrichedReport = { ...report, ...detailedData };
+        const enrichedReport = {
+          ...report,
+          ...detailedData,
+          id: kycId || detailedData._id,
+          _id: kycId || detailedData._id
+        };
         setSelectedUser(enrichedReport);
         setIsViewingDetails(true);
         setVerificationModal(true);
@@ -303,10 +309,16 @@ const KYC = () => {
   const handleVerifyUser = async (user) => {
     try {
       // Fetch detailed KYC data before opening verification modal
-      const detailedData = await fetchDetailedKYCData(user.id);
+      const kycId = user.id || user._id;
+      const detailedData = await fetchDetailedKYCData(kycId);
       if (detailedData) {
         // Merge the detailed data with the existing user data
-        const enrichedUser = { ...user, ...detailedData };
+        const enrichedUser = {
+          ...user,
+          ...detailedData,
+          id: kycId || detailedData._id,
+          _id: kycId || detailedData._id
+        };
         triggerVerificationForUser(enrichedUser);
       } else {
         // Fallback to basic user data if detailed fetch fails
@@ -320,13 +332,18 @@ const KYC = () => {
 
   const handleApproveUser = async (user) => {
     try {
-      // Production API call - using the correct endpoint
-      console.log('Approving user with ID:', user.id);
-      console.log('API endpoint:', `/lawma/kycs/${user.id}/approve`);
-      const { data } = await api.patch(`/lawma/kycs/${user.id}/approve`);
+      const kycId = user?.id || user?._id;
+      if (!kycId) {
+        showNotification('User ID not found for approval', 'error');
+        return;
+      }
+      console.log('Approving user with ID:', kycId);
+      console.log('API endpoint:', `/lawma/kycs/${kycId}/approve`);
+      const { data } = await api.patch(`/lawma/kycs/${kycId}/approve`);
       console.log('Approval response:', data);
       if (data) {
-        showNotification(`User ${user.applicant} has been approved`, 'success');
+        const displayName = (user.applicant && user.applicant !== 'N/A') ? user.applicant : (user.userType || 'User');
+        showNotification(`User ${displayName} has been approved`, 'success');
         setVerificationModal(false);
         fetchKYCAPI(activeTab);
       } else {
@@ -342,15 +359,20 @@ const KYC = () => {
 
   const handleRejectUser = async (user) => {
     try {
-      // Production API call - using the correct reject endpoint
-      console.log('Rejecting user with ID:', user.id);
-      console.log('API endpoint:', `/lawma/kycs/${user.id}/reject`);
-      const { data } = await api.patch(`/lawma/kycs/${user.id}/reject`, {
+      const kycId = user?.id || user?._id;
+      if (!kycId) {
+        showNotification('User ID not found for rejection', 'error');
+        return;
+      }
+      console.log('Rejecting user with ID:', kycId);
+      console.log('API endpoint:', `/lawma/kycs/${kycId}/reject`);
+      const { data } = await api.patch(`/lawma/kycs/${kycId}/reject`, {
         reason: rejectionReason || 'No reason provided'
       });
       console.log('Rejection response:', data);
       if (data) {
-        showNotification(`User ${user.applicant} has been rejected`, 'success');
+        const displayName = (user.applicant && user.applicant !== 'N/A') ? user.applicant : (user.userType || 'User');
+        showNotification(`User ${displayName} has been rejected`, 'success');
         setVerificationModal(false);
         fetchKYCAPI(activeTab);
       } else {
@@ -454,7 +476,7 @@ const KYC = () => {
   const getNinDocUrl = (user) => {
     if (!user) return '';
     // Check for both ninDoc and idDocument fields
-    const value = user.ninDoc || user.idDocument;
+    const value = user.ninDoc || user.idDocument || user.documentUrl;
     if (!value) return '';
     if (/^https?:\/\//i.test(value)) return value;
     return `/images/${value}`;
@@ -468,8 +490,8 @@ const KYC = () => {
   };
 
   const getAgentCertUrl = (user) => {
-    if (!user || !user.AgentCertificate) return '';
-    const value = user.AgentCertificate;
+    if (!user || (!user.AgentCertificate && !user.agentCertificate)) return '';
+    const value = user.AgentCertificate || user.agentCertificate;
     if (/^https?:\/\//i.test(value)) return value;
     return `/images/${value}`;
   };
@@ -477,18 +499,23 @@ const KYC = () => {
   const getVerificationStatus = () => {
     switch (activeTab) {
       case 'pending':
-        return { text: 'Pending', color: 'text-yellow-600' };
+        return { text: 'Pending', color: 'text-yellow-700', bgColor: 'bg-yellow-50 border border-yellow-200' };
       case 'approved':
-        return { text: 'Verified', color: 'text-green-600'};
+        return { text: 'Verified', color: 'text-green-700', bgColor: 'bg-green-50 border border-green-200' };
       case 'rejected':
-        return { text: 'Rejected', color: 'text-red-600' };
+        return { text: 'Rejected', color: 'text-red-700', bgColor: 'bg-red-50 border border-red-200' };
       default:
-        return { text: 'Unknown', color: 'text-gray-600' };
+        return { text: 'Unknown', color: 'text-gray-700', bgColor: 'bg-gray-50 border border-gray-200' };
     }
   };
 
   const isNinVerified = (user) => {
-    return user && user.ninVerified === true;
+    if (!user) return false;
+    return (
+      user.ninVerified === true ||
+      user.ninVerificationProviderStatus === 'verified' ||
+      user.identityVerificationStatus === 'verified'
+    );
   };
 
   const handleExport = () => {
