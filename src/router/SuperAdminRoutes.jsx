@@ -11,6 +11,7 @@ import WasteReports from "../SuperAdmin/WasteReports";
 import PaymentReportPage from "../SuperAdmin/PaymentsReport";
 import TeamsPage from "../SuperAdmin/TeamsPage";
 import Reconciliation from "../SuperAdmin/Reconciliation";
+import UserManagement from "../SuperAdmin/UserManagement";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 import LoadingComponent from "../components/LoadingComponent";
@@ -157,6 +158,16 @@ const SuperAdminRoutes = [
             <Suspense fallback={<LoadingComponent />}>
                 <ProtectedRoute>
                     <TeamsPage />
+                </ProtectedRoute>
+            </Suspense>
+        ),
+    },
+    {
+        path: "/user-management",
+        element: (
+            <Suspense fallback={<LoadingComponent />}>
+                <ProtectedRoute>
+                    <UserManagement />
                 </ProtectedRoute>
             </Suspense>
         ),

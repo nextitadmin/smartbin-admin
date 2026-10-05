@@ -10,6 +10,7 @@ import {
   ReportIcon,   // Used for Reports
   WasteIcon,    // Used for Bin distribution
   TeamsIcon,    // Used for PSPs and Team Management
+  UserIcon,
   MenuIcon,
   CloseIcon,
   // Assuming DocumentIcon is the icon with the document/paper look
@@ -21,12 +22,13 @@ import {
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: DashboardIcon },
   { name: 'Revenue analysis', href: '/revenue-analysis', icon: DocumentIcon },
-
-  { name: 'Smartbin Overview', href: '/smartbin-overview', icon: WasteIcon },
+  { name: 'Reconciliation', href: '/reconciliation', icon: DocumentIcon },
+  { name: 'Bin distribution', href: '/smartbin-overview', icon: WasteIcon },
   // Assuming PSPs stands for Private Sector Participants or similar, using the people icon
   { name: 'PSPs', href: '/psp-companies', icon: TeamsIcon },
   { name: 'Reports', href: '/reports', icon: ReportIcon },
   { name: 'Team Management', href: '/team', icon: TeamsIcon },
+  { name: 'User Management', href: '/user-management', icon: UserIcon },
 ];
 
 export default function Sidebar({ className = "" }) {
@@ -91,11 +93,16 @@ export default function Sidebar({ className = "" }) {
                 item.href === "/smartbin-overview" &&
                 (pathname === "/smartbin-overview" || pathname === "/delivered-smart-bins");
 
+              const isUserManagementSection =
+                item.href === "/user-management" &&
+                (pathname === "/user-management" || pathname.startsWith("/user-management/"));
+
               const isActive =
                 pathname === item.href ||
                 isRevenueSection ||
                 isReconciliationSection ||
-                isBinDistributionSection;
+                isBinDistributionSection ||
+                isUserManagementSection;
               return (
                 <Link
                   key={item.name}
