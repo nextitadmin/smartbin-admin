@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Sidebar from '../components/SuperAdmin/Sidebar';
 import Topbar from '../components/SuperAdmin/Topbar';
 import api from '../api/apiConfig';
@@ -41,6 +42,7 @@ const TeamsPage = () => {
     // Row action modal
     const [rowActionModal, setRowActionModal] = useState(false);
     const [currentMemberId, setCurrentMemberId] = useState(null);
+    const [dropdownPosition, setDropdownPosition] = useState({ top: null, bottom: null, right: 0 });
     const modalRef = useRef();
 
     // Activate/Deactivate modals
@@ -248,21 +250,66 @@ const TeamsPage = () => {
     };
 
     // Handle row action click
-    const handleRowActionClick = (id) => {
+    const handleRowActionClick = (id, event) => {
+        event.stopPropagation();
+        if (rowActionModal && currentMemberId === id) {
+            setRowActionModal(false);
+            setCurrentMemberId(null);
+            return;
+        }
+
+        const buttonRect = event.currentTarget.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - buttonRect.bottom;
+        const openUpward = spaceBelow < 160 && buttonRect.top > spaceBelow;
+        const rightPos = Math.max(12, window.innerWidth - buttonRect.right);
+
+        if (openUpward) {
+            setDropdownPosition({
+                top: null,
+                bottom: Math.max(12, window.innerHeight - buttonRect.top + 6),
+                right: rightPos
+            });
+        } else {
+            setDropdownPosition({
+                top: Math.max(12, buttonRect.bottom + 6),
+                bottom: null,
+                right: rightPos
+            });
+        }
+
         setCurrentMemberId(id);
         setRowActionModal(true);
     };
 
-    // Close row action modal when clicking outside
+    // Close row action modal when clicking outside or scrolling
     useEffect(() => {
         function handleClickOutside(event) {
-            if (rowActionModal && modalRef.current && !modalRef.current.contains(event.target)) {
+            if (
+                rowActionModal &&
+                modalRef.current &&
+                !modalRef.current.contains(event.target) &&
+                !event.target.closest('[data-action-trigger="true"]')
+            ) {
                 setRowActionModal(false);
+                setCurrentMemberId(null);
             }
         }
+
+        function handleScrollOrResize() {
+            if (rowActionModal) {
+                setRowActionModal(false);
+                setCurrentMemberId(null);
+            }
+        }
+
         document.addEventListener("mousedown", handleClickOutside);
+        window.addEventListener("scroll", handleScrollOrResize, true);
+        window.addEventListener("resize", handleScrollOrResize);
+
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
+            window.removeEventListener("scroll", handleScrollOrResize, true);
+            window.removeEventListener("resize", handleScrollOrResize);
         };
     }, [rowActionModal]);
 
@@ -522,7 +569,7 @@ const TeamsPage = () => {
                                     </button>
                                 </div>
 
-                                <div className="overflow-x-auto">
+                                <div>
                                     <h2 className="text-lg font-semibold text-zinc-700 p-4">All Team Members</h2>
                                     {isLoading ? (
                                         <SkeletonLoader />
@@ -539,105 +586,70 @@ const TeamsPage = () => {
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="bg-white rounded-2xl shadow-sm overflow-x-auto">
-                                            <table className="w-full min-w-[1200px] bg-white">
-                                                <thead className="border-b border-zinc-200">
+                                        <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-x-auto">
+                                            <table className="w-full min-w-[850px] bg-white">
+                                                <thead className="border-b border-zinc-200 bg-zinc-50/50">
                                                     <tr>
-                                                        <th className="lg:p-6 p-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider w-12 cursor-pointer" onClick={() => handleSort('id')}>
+                                                        <th className="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider w-14 cursor-pointer" onClick={() => handleSort('id')}>
                                                             <div className="flex items-center">
                                                                 S/N
                                                                 <SortIcon direction={sortConfig.key === 'id' ? sortConfig.direction : null} />
                                                             </div>
                                                         </th>
-                                                        <th className="lg:p-6 p-3 text-left text-sm font-medium text-zinc-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('name')}>
+                                                        <th className="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('name')}>
                                                             <div className="flex items-center">
                                                                 Name
                                                                 <SortIcon direction={sortConfig.key === 'name' ? sortConfig.direction : null} />
                                                             </div>
                                                         </th>
-                                                        <th className="lg:p-6 p-3 text-left text-sm font-medium text-zinc-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('email')}>
+                                                        <th className="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('email')}>
                                                             <div className="flex items-center">
                                                                 Email address
                                                                 <SortIcon direction={sortConfig.key === 'email' ? sortConfig.direction : null} />
                                                             </div>
                                                         </th>
-                                                        <th className="lg:p-6 p-3 text-left text-sm font-medium text-zinc-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('phone')}>
+                                                        <th className="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('phone')}>
                                                             <div className="flex items-center">
                                                                 Phone number
                                                                 <SortIcon direction={sortConfig.key === 'phone' ? sortConfig.direction : null} />
                                                             </div>
                                                         </th>
-                                                        <th className="lg:p-6 p-3 text-left text-sm font-medium text-zinc-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('role')}>
+                                                        <th className="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('role')}>
                                                             <div className="flex items-center">
                                                                 Role
                                                                 <SortIcon direction={sortConfig.key === 'role' ? sortConfig.direction : null} />
                                                             </div>
                                                         </th>
-                                                        <th className="lg:p-6 p-3 text-left text-sm font-medium text-zinc-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('status')}>
+                                                        <th className="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('status')}>
                                                             <div className="flex items-center">
                                                                 Status
                                                                 <SortIcon direction={sortConfig.key === 'status' ? sortConfig.direction : null} />
                                                             </div>
                                                         </th>
-                                                        <th className="lg:p-6 p-3 text-left text-sm font-medium text-zinc-500 uppercase tracking-wider">Action</th>
+                                                        <th className="px-4 py-3.5 text-right text-xs font-semibold text-zinc-500 uppercase tracking-wider w-16">Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-zinc-200">
                                                     {filteredMembers.map((member, index) => (
-                                                        <tr key={member.id} className="hover:bg-zinc-50 transition-colors duration-150">
-                                                            <td className="lg:p-6 p-3 text-sm text-zinc-500">{index + 1}.</td>
-                                                            <td className="lg:p-6 p-3 text-sm text-zinc-900">{member.name}</td>
-                                                            <td className="lg:p-6 p-3 text-sm text-zinc-700">{member.email}</td>
-                                                            <td className="lg:p-6 p-3 text-sm text-zinc-700">{member.phone}</td>
-                                                            <td className="lg:p-6 p-3 text-sm text-zinc-700">{getRoleDisplayName(member.role)}</td>
-                                                            <td className="lg:p-6 p-3 text-sm">
+                                                        <tr key={member.id} className="hover:bg-zinc-50/80 transition-colors duration-150">
+                                                            <td className="px-4 py-3.5 text-sm text-zinc-500">{index + 1}.</td>
+                                                            <td className="px-4 py-3.5 text-sm font-medium text-zinc-900">{member.name}</td>
+                                                            <td className="px-4 py-3.5 text-sm text-zinc-600">{member.email}</td>
+                                                            <td className="px-4 py-3.5 text-sm text-zinc-600">{member.phone}</td>
+                                                            <td className="px-4 py-3.5 text-sm text-zinc-600">{getRoleDisplayName(member.role)}</td>
+                                                            <td className="px-4 py-3.5 text-sm">
                                                                 <StatusBadge status={member.status} />
                                                             </td>
-                                                            <td className="lg:p-6 p-3">
-                                                                <div className="relative">
-                                                                    <button
-                                                                        onClick={() => handleRowActionClick(member.id)}
-                                                                        type="button"
-                                                                        className="p-1 text-zinc-500 hover:text-zinc-700"
-                                                                    >
-                                                                        <EllipsisVerticalIcon className="w-5 h-5" />
-                                                                    </button>
-                                                                    {rowActionModal && currentMemberId === member.id && (
-                                                                        <div
-                                                                            ref={modalRef}
-                                                                            className="absolute right-0 mt-1 z-50 bg-white rounded-xl shadow-xl p-4 border border-zinc-200"
-                                                                            style={{ minWidth: 120 }}
-                                                                        >
-                                                                            <p
-                                                                                className="p-2 cursor-pointer text-zinc-700 hover:bg-zinc-50"
-                                                                                onClick={() => openEditModal(member._id ?? member.id)}
-                                                                            >
-                                                                                Edit
-                                                                            </p>
-                                                                            {member.status === 'Active' ? (
-                                                                                <p 
-                                                                                    className="p-2 cursor-pointer text-zinc-700 hover:bg-zinc-50" 
-                                                                                    onClick={() => handleDeactivateClick(member)}
-                                                                                >
-                                                                                    Deactivate
-                                                                                </p>
-                                                                            ) : (
-                                                                                <p 
-                                                                                    className="p-2 cursor-pointer text-zinc-700 hover:bg-zinc-50" 
-                                                                                    onClick={() => handleActivateClick(member)}
-                                                                                >
-                                                                                    Activate
-                                                                                </p>
-                                                                            )}
-                                                                            <p 
-                                                                                className="p-2 cursor-pointer text-red-600 hover:bg-red-50" 
-                                                                                onClick={() => handleDeleteClick(member)}
-                                                                            >
-                                                                                Delete
-                                                                            </p>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
+                                                            <td className="px-4 py-3.5 text-right">
+                                                                <button
+                                                                    data-action-trigger="true"
+                                                                    onClick={(e) => handleRowActionClick(member.id, e)}
+                                                                    type="button"
+                                                                    className="p-1.5 text-zinc-500 hover:text-zinc-800 rounded-lg hover:bg-zinc-100 transition duration-150"
+                                                                    title="Actions"
+                                                                >
+                                                                    <EllipsisVerticalIcon className="w-5 h-5" />
+                                                                </button>
                                                             </td>
                                                         </tr>
                                                     ))}
@@ -646,6 +658,59 @@ const TeamsPage = () => {
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Portal dropdown for row actions */}
+                                {rowActionModal && currentMemberId !== null && (() => {
+                                    const member = teamMembers.find(m => m.id === currentMemberId || m._id === currentMemberId);
+                                    if (!member) return null;
+
+                                    return createPortal(
+                                        <div
+                                            ref={modalRef}
+                                            className="fixed z-[9999] bg-white rounded-xl shadow-xl py-1.5 px-1 border border-zinc-200 min-w-[150px] text-sm animate-in fade-in duration-150"
+                                            style={{
+                                                position: 'fixed',
+                                                zIndex: 9999,
+                                                right: dropdownPosition.right,
+                                                ...(dropdownPosition.top !== null ? { top: dropdownPosition.top } : {}),
+                                                ...(dropdownPosition.bottom !== null ? { bottom: dropdownPosition.bottom } : {})
+                                            }}
+                                        >
+                                            <button
+                                                type="button"
+                                                className="w-full text-left px-3 py-2 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 rounded-lg transition-colors duration-150"
+                                                onClick={() => openEditModal(member._id ?? member.id)}
+                                            >
+                                                Edit
+                                            </button>
+                                            {member.status === 'Active' ? (
+                                                <button
+                                                    type="button"
+                                                    className="w-full text-left px-3 py-2 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 rounded-lg transition-colors duration-150"
+                                                    onClick={() => handleDeactivateClick(member)}
+                                                >
+                                                    Deactivate
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    className="w-full text-left px-3 py-2 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 rounded-lg transition-colors duration-150"
+                                                    onClick={() => handleActivateClick(member)}
+                                                >
+                                                    Activate
+                                                </button>
+                                            )}
+                                            <button
+                                                type="button"
+                                                className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                                                onClick={() => handleDeleteClick(member)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>,
+                                        document.body
+                                    );
+                                })()}
 
                                 {/* Add Member Modal */}
                                 {isModalOpen && (
