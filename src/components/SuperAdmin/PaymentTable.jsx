@@ -67,7 +67,8 @@ const PaymentTable = ({
     currentPage = 1, 
     totalPages = 1, 
     onPageChange = () => {}, 
-    loading = false 
+    loading = false,
+    totalRevenue = 0
 }) => {
     const { items: paymentDetails, requestSort, sortConfig } = useSortableData(initialPaymentDetails);
     const navigate = useNavigate();
@@ -98,7 +99,14 @@ const PaymentTable = ({
     return (
         <div className="mt-6 bg-white rounded-xl border border-zinc-200">
             <div className="p-4 sm:p-6 flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-zinc-800">PSP revenue</h2>
+                <div>
+                    <h2 className="text-lg font-semibold text-zinc-800">PSP revenue</h2>
+                    {totalRevenue > 0 && (
+                        <p className="text-xs text-zinc-500 mt-0.5">
+                            Total: ₦{Number(totalRevenue).toLocaleString()}
+                        </p>
+                    )}
+                </div>
                 <button onClick={handleViewAll} className="text-sm font-medium text-green-600 hover:text-green-700">View all</button>
             </div>
             <div className="overflow-x-auto">
@@ -118,12 +126,16 @@ const PaymentTable = ({
                         </tr>
                     </thead>
                     <tbody className="relative">
-                        {loading && (
-                            <tr className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10">
-                                <td colSpan={headers.length} className="py-8 text-center text-zinc-500">Loading PSP revenues...</td>
+                        {loading ? (
+                            <tr>
+                                <td colSpan={headers.length} className="px-6 py-12 text-center text-zinc-500">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <div className="w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Loading PSP revenue...</span>
+                                    </div>
+                                </td>
                             </tr>
-                        )}
-                        {paymentDetails.length === 0 ? (
+                        ) : paymentDetails.length === 0 ? (
                             <tr>
                                 <td colSpan={headers.length} className="px-6 py-10 text-center text-zinc-500">
                                     No records found.
